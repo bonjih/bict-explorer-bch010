@@ -24,7 +24,10 @@ public class Degree {
         courses = Collections.unmodifiableMap(readOptions(coursesFile, new LinkedHashMap<>()));
         minors = Collections.unmodifiableMap(readOptions(minorsFile, courses));
         careers = Collections.unmodifiableMap(readOptions(careersFile, minors));
+
     }
+
+
 
     /**
      * Reads a tab-separated file describing the available options.
@@ -48,7 +51,9 @@ public class Degree {
     static Map<String, Option> readOptions(File file, Map<String, Option> downStream)
             throws IOException, ParseException {
         Map<String, Option> result = new LinkedHashMap<>();
+
         try (Scanner input = new Scanner(file)) {
+
             while (input.hasNextLine()) {
                 String line = input.nextLine();
                 if (line.isEmpty() || line.startsWith("%")) {
@@ -56,15 +61,18 @@ public class Degree {
                     continue;
                 }
                 String[] fields = line.split("\t", -1);
+
                 if (fields.length < 4 || fields[0].isEmpty() || fields[1].isEmpty()) {
                     throw new ParseException("Bad option: " + line, 0);
                 }
                 String[] downCodes = fields[2].isEmpty() ? new String[0] : fields[2].split(",");
+
                 // map each downstream code to the corresponding option.
                 // Option[] downOptions = Arrays.stream(downCodes).map(c -> downStream.get(c)).toArray(Option[]::new);
 
                 // more readable as a loop
                 Option[] downOptions = new Option[downCodes.length];
+
                 for (int i = 0; i < downCodes.length; i++) {
                     downOptions[i] = downStream.get(downCodes[i]);
                     if (downOptions[i] == null) {
@@ -76,9 +84,6 @@ public class Degree {
                 final Option opt;
                 if (fields.length == 4) {
                     opt = new Option(fields[0], fields[1], fields[3], downOptions);
-                } else if (fields.length == 5) {
-                    PreReqs pre = new PreReqs(""); // no prereqs
-                    opt = new Course(fields[0], fields[1], fields[3], fields[4], pre, downOptions);
                 } else if (fields.length == 6) {
                     PreReqs pre = new PreReqs(fields[5]);
                     opt = new Course(fields[0], fields[1], fields[3], fields[4], pre, downOptions);

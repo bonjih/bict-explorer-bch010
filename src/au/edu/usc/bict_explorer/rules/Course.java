@@ -12,7 +12,7 @@ public class Course extends Option {
     /** A non-null string containing a set of '1', '2', and/or '3' characters. */
     private final String semesters;
 
-    /** The prerequsites of this course. */
+    /** The prerequisites of this course. */
     private final PreReqs preReqs;
 
     /**
@@ -27,8 +27,8 @@ public class Course extends Option {
      */
     public Course(String code, String name, String desc, String semesters, PreReqs pre, Option... downstream) {
         super(code, name, desc, downstream);
-        assert semesters != null;
-        assert pre != null;
+        assert semesters != null; //  Precondition: semesters is not null
+        assert pre != null; //  Precondition: pre is not null
         this.semesters = semesters;
         this.preReqs = pre;
     }
