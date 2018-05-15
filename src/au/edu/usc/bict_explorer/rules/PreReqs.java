@@ -30,7 +30,7 @@ public class PreReqs {
      * @param courses the courses in the degree, with chosen flags showing which ones will be taken.
      * @return true if prerequisites are satisfied.
      */
-    public boolean isSatisfied(Map<String, Option> courses) {
+    public boolean isSatisfied(Map<String, Course> courses) {
         for (String req : required) {
             if (!courses.containsKey(req)) {
                 return false;

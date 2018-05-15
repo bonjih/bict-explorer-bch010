@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Map;
 
-public class textBasedPrint {
+public class textBasedPrint_TEXT {
 
     public static void main(String[] args) throws Exception {
 

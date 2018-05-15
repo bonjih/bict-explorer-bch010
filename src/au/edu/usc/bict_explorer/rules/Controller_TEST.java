@@ -5,6 +5,7 @@ import au.edu.usc.bict_explorer.rules.Option;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
@@ -15,11 +16,13 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class Controller_TEST implements Initializable {
 
     File fileCareers = new File( "src/au/edu/usc/bict_explorer/resources/careers.options" );
     File fileMinors = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
     File fileCourses = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
+
+
 
     @FXML
     private BorderPane pane;
@@ -27,9 +30,7 @@ public class Controller implements Initializable {
     @FXML
     private Button labelAP;
 
-//    @FXML
-//    void onSelectAddMinorSDGP(ActionEvent event) {
-//        labelSD.
+
 
     @FXML
     private Button lableDA;
@@ -58,12 +59,23 @@ public class Controller implements Initializable {
 
     private Degree degree = new Degree( fileCareers, fileMinors, fileCourses );
 
-    public Controller() throws IOException, ParseException {
+    public Controller_TEST() throws IOException, ParseException {
 
     }
 
     @FXML
-    private void onSelectAddMinorSDGP(javafx.event.ActionEvent event) throws Exception {
+    void onSelectAddMinorSDGP(javafx.event.ActionEvent actionEvent) throws IOException, ParseException {
+        Degree degree = new Degree( fileCareers, fileMinors, fileCourses );
+        degree.careers();
+        fileCareers.getName();
+        System.out.println(degree.careers().values());
+
+//        ToggleButton sourceButton = (ToggleButton) actionEvent.getSource();
+
+//            if (!sourceButton.isSelected() )
+//                for (Map.O)
+//
+//            {
 
     }
 

@@ -12,6 +12,12 @@
     -fx-font-family: "Arial";
 }
 
+.toggle-button {
+    -fx-color: paleturquoise;
+}
+
+
+
 .button {
     -fx-text-fill: MediumBlue;
     -fx-background-color: lightgray;
@@ -21,6 +27,8 @@
     -fx-font-size: 11;
     -fx-font-family: sans-serif;
 }
+
+
 
 .button:hover {
    -fx-background-color: green;
