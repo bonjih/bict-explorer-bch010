@@ -14,29 +14,47 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import au.edu.usc.bict_explorer.rules.Course;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
+import au.edu.usc.bict_explorer.rules.Course;
 
 
 /**
  *
- * @author Ben Hamilton
+ * @author Ben hamilton
  */
-
-public class BICTexplorerController {
+public class BICT_explorer extends Application {
     static Degree myDegree;
-    static Option selectedCareer ;//= null;
+    //  static Option careerChoice ;//= null;
     static Option extraSelectedMinor;
     static Set<Option> downStreamCourse ;
+    static Option selectedCareer;
 
     /**
+     * @param stage
      * @param args the command line arguments
      * @throws java.io.FileNotFoundException
      */
 
+    @Override
+    public void start(Stage stage) throws IOException{
+        Parent root = FXMLLoader.load(getClass().getResource("BICT_fxml.fxml"));
+
+        Scene scene =new Scene(root);
+        scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );
+        stage.setScene(scene);
+        stage.setTitle("BICT EXPLORER");
+        stage.show();
+    }
     public static void main(String[] args) throws FileNotFoundException,NoSuchElementException{
+        Application.launch(args);
         Scanner input = new Scanner(System.in);
+
 
         File file =new File("bict.txt");
 
@@ -47,10 +65,11 @@ public class BICTexplorerController {
             File fileMinors = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
             File fileCourses = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
 
-            myDegree =new Degree(fileCareers,fileMinors,fileCourses);
+            myDegree = new Degree(fileCareers,fileMinors,fileCourses);
+
 
         } catch (IOException | ParseException ex) {
-            Logger.getLogger(BICTexplorerController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BICT_explorer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Map<String,Option> courses = myDegree.courses();
@@ -70,22 +89,27 @@ public class BICTexplorerController {
 
         for(String key : careerKeys){
             if( key.equals(careerChoice.toUpperCase())){
-                //  System.out.println(key);
+
                 selectedCareer = (Option) careers.get(key);
                 System.out.println(selectedCareer.getCode());
                 selectedCareer.setChosen(true);
+                myDegree.careers().get(key).setChosen(true);
+
             }
         }
-
+        System.out.println("");
+        myDegree.processChanges();
         //compulsory minors plus one optional
-        Set<Option> compulsoryMinors = minors.get("BICT").getDownstream(); // 'BICT' refer to new line in minors.options
+        Set<Option> compulsoryMinors = minors.get("BICT").getDownstream();
         Set<Option> minorCourseForthisCareer = selectedCareer.getDownstream();
         Set<String> selectedMinorKeys = new HashSet<>();
         Set<Option> upstream;// = compulsoryMinors
 
         System.out.println("You must do the following courses:");
-        System.out.println("Minor couses for "+selectedCareer.getName());
+        System.out.println("Minor courses for "+selectedCareer.getName());
+
         minorCourseForthisCareer.forEach((Option action)->{
+                    // System.out.println(action +" "+ action.getName());
                     System.out.println(action +" "+ action.getName());
                     bictOut.println(action +" "+ action.getName());
                     selectedMinorKeys.add(action.getCode());
@@ -108,7 +132,7 @@ public class BICTexplorerController {
 
         minorKeys.stream().filter((key) -> (selectedMinor.equals(key))).forEachOrdered((key) -> {
             if( selectedMinorKeys.add(key))
-                System.out.println("Success");
+                System.out.println("success");
             else
                 System.out.println(key+"\t Already exists");
         }); //extraSelectedMinor = (Option)minors.get(key);
@@ -149,12 +173,6 @@ public class BICTexplorerController {
 
         //a little bit of spacing
         System.out.println("");
-        // Map<String,Course> myCourses = new HashMap<>();
-       /* Iterator courseKeyIterator = selectedCoursesKeys.iterator();
-        while(courseKeyIterator.hasNext()){
-         //   Course put = myCourses.put((String)courseKeyIterator.next(), (Course) courses.get((String)courseKeyIterator.next()));
-            //put.setChosen(true);
-        }*/
 
         Map<String,Course> pre = new HashMap<>();
 
@@ -165,7 +183,7 @@ public class BICTexplorerController {
             String[] preRequisitesArray = null;
             if(!preRequisites.isEmpty()){
                 preRequisitesArray =   preRequisites.split(",");
-                // pre.put(, value)
+
                 for(String preArray : preRequisitesArray){
                     pre.put(preArray,(Course)courses.get(preArray));
                 }
@@ -180,10 +198,9 @@ public class BICTexplorerController {
                         "\t NOT SATISFIED");
             }
             bictOut.println(course.getValue().getCode()+"\t"+course.getValue().getName()+"\t Semester:"+course.getValue().getSemesters()+"\t Prerequisites \t"+preRequisites);
-            //pre.clear();
+
         });
-//                 file.setWritable(false);
+
         bictOut.close();
     }
 }
-

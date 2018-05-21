@@ -21,6 +21,7 @@ public class textBasedPrint_TEXT {
 
         for (Map.Entry<String, Option> careersKey : degree.careers().entrySet()) {
             bictOut.println( "Careers: " + careersKey.getValue().getName() + careersKey.getValue().getDownstream() );
+
             for (Map.Entry<String, Option> minorsKey : degree.minors().entrySet())
                 bictOut.println( "Minors: " + minorsKey.getValue().getName() + " " + minorsKey.getValue().getCode() );
             for (Map.Entry<String, Option> courseKey : degree.courses().entrySet()) {

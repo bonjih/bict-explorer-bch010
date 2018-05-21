@@ -10,13 +10,19 @@
     -fx-font-size: 11pt;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
+    -fx-pref-width: 283px;
+}
+
+.hbox {
+    -fx-font-size: 11pt;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
+
 }
 
 .toggle-button {
     -fx-color: paleturquoise;
 }
-
-
 
 .button {
     -fx-text-fill: MediumBlue;
@@ -26,9 +32,9 @@
     -fx-padding: 2 4 4 4;
     -fx-font-size: 11;
     -fx-font-family: sans-serif;
+    -fx-pref-width: 90px;
+    -fx-pref-height: 23px;
 }
-
-
 
 .button:hover {
    -fx-background-color: green;

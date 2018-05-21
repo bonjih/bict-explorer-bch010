@@ -1,15 +1,18 @@
 package au.edu.usc.bict_explorer.rules;
 
-import au.edu.usc.bict_explorer.rules.Degree;
-import au.edu.usc.bict_explorer.rules.Option;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -18,66 +21,76 @@ import java.util.ResourceBundle;
 
 public class Controller_TEST implements Initializable {
 
+
+
+    final FileChooser fileChooser = new FileChooser();
+    MenuItem exit = new MenuItem();
+
+
     File fileCareers = new File( "src/au/edu/usc/bict_explorer/resources/careers.options" );
     File fileMinors = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
     File fileCourses = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
 
+    Degree myDegree = new Degree( fileCareers, fileMinors, fileCourses );
 
 
     @FXML
     private BorderPane pane;
 
     @FXML
-    private Button labelAP;
-
-
+    private VBox vBoxCareer;
 
     @FXML
-    private Button lableDA;
+    private VBox vBoxMinors;
 
     @FXML
-    private Button labelNA;
+    private HBox hBoxCompCourses;
 
     @FXML
-    private Button labelBA;
+    private MenuItem fileOpen;
 
     @FXML
-    private Button labelSD;
-
-    @FXML
-    private Button labelGP;
-
-    @FXML
-    private Button labelTN;
-
-    @FXML
-    private Button labelDM;
-
-    @FXML
-    private Button labelIS;
-
-
-    private Degree degree = new Degree( fileCareers, fileMinors, fileCourses );
+    private MenuItem guiClose;
 
     public Controller_TEST() throws IOException, ParseException {
 
     }
 
     @FXML
-    void onSelectAddMinorSDGP(javafx.event.ActionEvent actionEvent) throws IOException, ParseException {
-        Degree degree = new Degree( fileCareers, fileMinors, fileCourses );
-        degree.careers();
+    void setOnfileOpenRequest(ActionEvent actionEvent) throws IOException, ParseException {
+
+        fileChooser.setTitle( "Open file" );
+        fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
+    }
+
+    @FXML
+    void setOnfileSaveRequest(ActionEvent actionEvent) throws IOException, ParseException {
+
+    }
+
+    @FXML
+    void setOnCloseRequest() throws IOException, ParseException {
+        guiClose.setOnAction( t -> System.exit( 0 ) );
+
+    }
+
+    @FXML
+    void onSelectAddMinorSDGP(ActionEvent actionEvent) throws IOException, ParseException {
+
+        myDegree.careers();
         fileCareers.getName();
-        System.out.println(degree.careers().values());
+//        System.out.println(myDegree.careers().values());
 
 //        ToggleButton sourceButton = (ToggleButton) actionEvent.getSource();
 
-//            if (!sourceButton.isSelected() )
-//                for (Map.O)
+//            if (!sourceButton.isSelected() ) {
+//                sourceButton.setSelected(true);
 //
-//            {
-
+//
+//                }
+//
     }
+
 
     @FXML
     private void onSelectAddMinorDMSD(javafx.event.ActionEvent event) throws Exception {
@@ -94,10 +107,54 @@ public class Controller_TEST implements Initializable {
 
     }
 
+    public class ButtonEventHandler implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent event) {
+//            ToggleButton sourceButton = (ToggleButton) event.getSource();
+
+//            if (!sourceButton.isSelected()) {
+//                sourceButton.setSelected( true );
+//
+//            }
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        assert pane != null;
 
+        for (String key : myDegree.careers().keySet()) {
+            Option career = myDegree.careers().get( key );
+            Button btCareer = new Button( career.getName() );
+            vBoxCareer.getChildren().add( btCareer );
+            vBoxCareer.setAlignment( Pos.TOP_CENTER );
+            vBoxCareer.setSpacing( 25 );
+
+//            btCareer.setOnAction( new ButtonEventHandler() );
+//            btCareer.setOnMouseClicked(e ->
+//            System.out.println( myDegree.careers().values() );
+        }
+
+        for (String key : myDegree.minors().keySet()) {
+            Option minors = myDegree.minors().get( key );
+            Button btMinors = new Button( minors.getName() );
+
+            vBoxMinors.getChildren().add( btMinors );
+            vBoxMinors.setAlignment( Pos.TOP_CENTER );
+            vBoxMinors.setSpacing( 25 );
+        }
+
+        for (String key : myDegree.courses().keySet()) {
+            Option courses = myDegree.courses().get( key );
+            Button btCourses = new Button( courses.getCode() );
+
+            hBoxCompCourses.setAlignment( Pos.CENTER_RIGHT );
+
+            btCourses.setMaxWidth( Double.MAX_VALUE );
+            HBox.setHgrow( btCourses, Priority.ALWAYS );
+            hBoxCompCourses.setSpacing( 5 );
+
+            hBoxCompCourses.getChildren().add( btCourses );
+
+        }
     }
 }
