@@ -1,6 +1,5 @@
 package au.edu.usc.bict_explorer.bict_explorer;
 
-import au.edu.usc.bict_explorer.rules.Course;
 import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
 import javafx.application.Platform;
@@ -11,13 +10,11 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -56,7 +53,6 @@ public class BICT_fxmlController implements Initializable {
 
     ObservableList<String> careerListItems = FXCollections.observableArrayList();
 //    ObservableList<String> courseListItems = FXCollections.observableArrayList();
-
 
 
     @FXML
@@ -241,7 +237,7 @@ public class BICT_fxmlController implements Initializable {
 
             System.out.println( line );
 
-            textArea.appendText(line );
+            textArea.appendText( line );
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -300,16 +296,7 @@ public class BICT_fxmlController implements Initializable {
             }
         }
 
-//        for (String key : myDegree.courses().keySet()) {
-//            Option courses = myDegree.courses().get( key );
-//            Button btCourses = new Button( courses.getCode() );
-//            coursesBox.getChildren().add( btCourses );
-//        }
-
-
-        }
-
-
+    }
 
     private void updateMinors(Option selectedCareer) {
         //define the checkbox select or not selected properties
@@ -374,7 +361,6 @@ public class BICT_fxmlController implements Initializable {
         System.out.println( selectedMinorKeys.size() );
     }
 
-
     private void devChecked() {
         if (selectedMinorKeys.size() == 3) {
             //selectedMinorKeys.remove(selectedMinorKeys.)
@@ -394,10 +380,10 @@ public class BICT_fxmlController implements Initializable {
             selectedMinorKeys.remove( removeKey );
             System.out.println( selectedMinorKeys.size() );
         }
+        // add courses to GUI
         for (Map.Entry<String, Option> courseC : courses.entrySet()) {
             Button btCourses = new Button( courseC.getValue().getCode() );
             coursesBox.getChildren().add( btCourses );
-
         }
     }
 
