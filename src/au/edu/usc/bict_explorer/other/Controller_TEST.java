@@ -1,5 +1,8 @@
-package au.edu.usc.bict_explorer.rules;
+package au.edu.usc.bict_explorer.other;
 
+import au.edu.usc.bict_explorer.rules.Degree;
+import au.edu.usc.bict_explorer.rules.Option;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -21,21 +24,13 @@ import java.util.ResourceBundle;
 
 public class Controller_TEST implements Initializable {
 
-
-
     final FileChooser fileChooser = new FileChooser();
-    MenuItem exit = new MenuItem();
-
 
     File fileCareers = new File( "src/au/edu/usc/bict_explorer/resources/careers.options" );
     File fileMinors = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
     File fileCourses = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
 
     Degree myDegree = new Degree( fileCareers, fileMinors, fileCourses );
-
-
-    @FXML
-    private BorderPane pane;
 
     @FXML
     private VBox vBoxCareer;
@@ -70,7 +65,7 @@ public class Controller_TEST implements Initializable {
 
     @FXML
     void setOnCloseRequest() throws IOException, ParseException {
-        guiClose.setOnAction( t -> System.exit( 0 ) );
+        guiClose.setOnAction( t -> Platform.exit() );
 
     }
 

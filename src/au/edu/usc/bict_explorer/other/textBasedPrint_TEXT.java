@@ -1,4 +1,4 @@
-package au.edu.usc.bict_explorer.resources;
+package au.edu.usc.bict_explorer.other;
 
 
 import au.edu.usc.bict_explorer.rules.Degree;

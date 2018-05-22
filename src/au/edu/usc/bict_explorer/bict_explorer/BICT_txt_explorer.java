@@ -1,7 +1,6 @@
 package au.edu.usc.bict_explorer.bict_explorer;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -9,26 +8,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
 import au.edu.usc.bict_explorer.rules.Course;
 
 
 /**
- *
- * @author Ben hamilton
+ * @author Ben Hamilton (aka bonjih)
  */
-public class BICT_explorer extends Application {
+
+/**
+ * This Class prints to file "bict.txt" the Course options output of chosen Career and minors
+ */
+
+public class BICT_txt_explorer {
+
     static Degree myDegree;
     //  static Option careerChoice ;//= null;
     static Option extraSelectedMinor;
@@ -41,20 +39,9 @@ public class BICT_explorer extends Application {
      * @throws java.io.FileNotFoundException
      */
 
-    @Override
-    public void start(Stage stage) throws IOException{
-        Parent root = FXMLLoader.load(getClass().getResource("BICT_fxml.fxml"));
+    public static void main(String[] args) throws Exception {
 
-        Scene scene =new Scene(root);
-        scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );
-        stage.setScene(scene);
-        stage.setTitle("BICT EXPLORER");
-        stage.show();
-    }
-    public static void main(String[] args) throws FileNotFoundException,NoSuchElementException{
-        Application.launch(args);
         Scanner input = new Scanner(System.in);
-
 
         File file =new File("bict.txt");
 
@@ -67,9 +54,8 @@ public class BICT_explorer extends Application {
 
             myDegree = new Degree(fileCareers,fileMinors,fileCourses);
 
-
         } catch (IOException | ParseException ex) {
-            Logger.getLogger(BICT_explorer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BICT_txt_explorer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         Map<String,Option> courses = myDegree.courses();
