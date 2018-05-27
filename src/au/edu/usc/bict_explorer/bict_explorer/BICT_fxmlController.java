@@ -3,15 +3,11 @@ package au.edu.usc.bict_explorer.bict_explorer;
 import au.edu.usc.bict_explorer.rules.Course;
 import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -19,24 +15,31 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
 
 /**
- * BICT (GUI) Controller class
- *
  * @author Ben Hamilton
  */
 
-public class BICT_fxmlController implements Initializable {
+/**
+ * BICT GUI / FXML Controller Class
+ * Handles the shape additions to the scene and shape/node behaviour
+ */
+
+public class BICT_fxmlController implements Initializable { //initialise the controller when created in the call to FXMLLoader.load
     Degree myDegree;
     Option selectedCareer;
     Option selectedCourses;
@@ -54,6 +57,10 @@ public class BICT_fxmlController implements Initializable {
     Set<Option> minorCourseForthisCareer;
 
 
+    /**
+     * Career observable list and used to listen when list changes
+     * Observability by wrapping lists with ObservableList.
+     */
     ObservableList<String> careerListItems = FXCollections.observableArrayList();
 
     @FXML
@@ -101,16 +108,13 @@ public class BICT_fxmlController implements Initializable {
     @FXML
     private FlowPane otherMinorsPane;
 
-    //Map<String,CheckBox> checkBoxMap = new HashMap<>();
-    //ObservableList<CheckBox> minorsCheckBox  = FXCollections.observableArrayList(soft_dev_cb,game_prog_cb,database_cb,telcom_net_cb);
-    Set<String> selectedMinorKeys = new LinkedHashSet<>();
-    Stage stage = new Stage();
+    @FXML
+    private Text errorStatus;
 
     private final Map<Object, ToggleButton> courseMap = new HashMap<>();
-
     private Option compulsoryMinors;
-    private Option otherMinors;
-
+    private Set<String> selectedMinorKeys = new LinkedHashSet<>();
+    private Stage stage = new Stage();
 
     /**
      * Initializes the controller class.
@@ -118,7 +122,6 @@ public class BICT_fxmlController implements Initializable {
      * @param url
      * @param rb
      */
-
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -155,10 +158,10 @@ public class BICT_fxmlController implements Initializable {
 
         //compulsory minors
 
-        compulsoryMinorsPane.getChildren().add(displayCompulsoryMinors());
+        compulsoryMinorsPane.getChildren().add( displayCompulsoryMinors() );
 //        confirmMinor.setDisable(true);
 
-        otherMinorsPane.getChildren().add(displayOtherMinors());
+        otherMinorsPane.getChildren().add( displayOtherMinors() );
 
         soft_dev_cb.setDisable( true );
         game_prog_cb.setDisable( true );
@@ -175,57 +178,65 @@ public class BICT_fxmlController implements Initializable {
     final FileChooser fileChooser = new FileChooser();
     ToggleButton tbButton = new ToggleButton();
 
+    /**
+     * @throws IOException    to throw error if read file is incorrect.
+     * @throws ParseException if the given format (txt) is not supplied.
+     *                        Event handler for open file request.
+     */
     @FXML
-    void setOnfileOpenRequest(ActionEvent actionEvent) throws IOException, ParseException {
+    void setOnfileOpenRequest() throws IOException, ParseException {
 
         fileChooser.setTitle( "Open file" );
-//        fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
 
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter( "Text Files", "*.txt" ),
                 new FileChooser.ExtensionFilter( "All Files", "*.*" ) );
 
-        //showing the file chosen
-        File isChosen = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
 
-        // opening a scanner
-        try (Scanner scan = new Scanner( isChosen )) {
+        File savedFile = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
 
-            // grabbing the file data String
-            String content = scan.useDelimiter( "/n" ).next();
+        if (savedFile != null) {
+
+            try (Scanner scan = new Scanner( savedFile )) {
+
+                // grabbing the file data String
+                String content = scan.useDelimiter( "/n" ).next(); //TODO
 //            myTextArea.setText( content );
 
-            // saving the file for  use by the fileSave
-            dataFile = isChosen;
+                dataFile = savedFile;
 
-            // enabling fileSave
-            fileSave.setDisable( false );
+                // enabling fileSave
+                fileSave.setDisable( false );
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    /**
+     * @throws IOException    to throw error if write to file error has occurred.
+     * @throws ParseException if the given format (txt) is not supplied.
+     *                        Event handler for save file request
+     */
     @FXML
-    private void setOnfileSaveAsRequest(ActionEvent actionEvent) throws IOException, ParseException {
+    private void setOnfileSaveAsRequest() throws IOException, ParseException {
 
         fileChooser.setTitle( "Save file" );
-//        fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
 
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter( "Text Files", "*.txt" ),
                 new FileChooser.ExtensionFilter( "All Files", "*.*" ) );
 
-        //showing the file chosen
-        File isChosen = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
+        File saveAsFile = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
 
-        if (isChosen != null) {
-            try (PrintStream ps = new PrintStream( isChosen )) {
+        if (saveAsFile != null) {
+            try (PrintStream ps = new PrintStream( saveAsFile )) {
 
 //                ps.print( careersBox.getText() );
 
                 // saving the file for use by the fileSave
-                dataFile = isChosen;
+                dataFile = saveAsFile;
 
                 // enabling fileSave
                 fileSave.setDisable( false );
@@ -237,69 +248,52 @@ public class BICT_fxmlController implements Initializable {
 
     }
 
+    /**
+     * Event handler to exit from program
+     */
     @FXML
-    void setOnCloseRequest() throws IOException, ParseException {
-
+    void setOnCloseRequest() {
 
 //        guiClose.setOnAction( t -> Platform.exit() );
         guiClose.setOnAction( t -> System.exit( 0 ) ); /// ***********TODO fix
     }
 
+    /**
+     * @throws IOException    to throw error if txt file does not exist.
+     * @throws ParseException if the given format (txt) is not supplied.
+     * Event handler for 'about/help' menu'
+     */
     @FXML
-    void setOnAboutRequest() throws IOException, ParseException {
-        final TextArea textArea = new TextArea();
-//        VBox vBoxPopup = new VBox( textArea );
-        FlowPane helpPopup = new FlowPane( textArea );
+    void setOnAboutRequest(ActionEvent event) throws IOException, ParseException {
+        String helpFile = new File( "src/au/edu/usc/bict_explorer/bict_explorer/menuItemHelp.txt" ).toURI().toURL().toExternalForm();
 
-        try (Scanner sf = new Scanner( new File( "src/au/edu/usc/bict_explorer/bict_explorer/menuItemHelp.txt" ) )) {
+        WebView webView = new WebView();
+        webView.setMaxHeight( 300 );
+        webView.setMaxWidth( 550 );
 
+        errorStatus = new Text();
 
-            while (sf.hasNext())
-                System.out.println(sf.next());
+         if (helpFile != null) {
+            try {
 
-                String line = sf.next();
-
-            textArea.appendText( line );
-//            textArea.requestFocus();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-//        File file = new File( "src/au/edu/usc/bict_explorer/bict_explorer/menuItemHelp.txt" )
-//        public List<String> read(File file) {
-//
-//            List<String> lines = new ArrayList<String>();
-//            String line;
-//            try {
-//                BufferedReader br = new BufferedReader(new FileReader(file));
-//
-//                while ((line = br.readLine()) != null) {
-//                    lines.add(line);
-//                }
-//                br.close();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//
-//            return lines;
-//        }
-
-        onAbout.setOnAction( new EventHandler<ActionEvent>() {
-
-            public void handle(ActionEvent t) {
-
-
-                Scene newScenePopup = new Scene( helpPopup, 300, 100 );
-
-
-                stage.setTitle( "Help" );
-                stage.setScene( newScenePopup );
+                webView.getEngine().load( helpFile );
+                Scene scene = new Scene( webView  );
+                stage.setTitle( "Help Menu" );
+                stage.setResizable( false );
+                stage.setScene( scene );
                 stage.show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorStatus.setText( "An ERROR occurred while loading the file!" );
             }
-        } );
+        }
     }
 
+    /**
+     * @param e not used
+     * Mouse even handler for career selection
+     */
     @FXML
     public void onCareerSelected(MouseEvent e) {
 
@@ -341,8 +335,11 @@ public class BICT_fxmlController implements Initializable {
         }
     }
 
+    /**
+     * @param selectedCareer Unique code for a career
+     * Defines the properties when the minor checkbox is selected or not.
+     */
     private void updateMinors(Option selectedCareer) {
-        //define the checkbox select or not selected properties
         soft_dev_cb.setDisable( false );
         game_prog_cb.setDisable( false );
         database_cb.setDisable( false );
@@ -354,21 +351,17 @@ public class BICT_fxmlController implements Initializable {
         info_systems.setSelected( false );
         telcoms_cb.setSelected( false );
 
-//        System.out.println("******" + soft_dev_cb.getText());
         minorCourseForthisCareer = selectedCareer.getDownstream();
-        compulsoryMinors.setChosen(true);
+        compulsoryMinors.setChosen( true );
 
         Object[] keys = selectedMinorKeys.toArray();
         ArrayList<Object> keysList = new ArrayList<>( Arrays.asList( keys ) );
-        //   Object[] toArray = keysList.toArray(keys);
 
         if (selectedMinorKeys.size() > 2) {
-
             while (selectedMinorKeys.size() > 1) {
                 String removeKey = (String) keysList.get( keysList.size() - 1 );
                 selectedMinorKeys.remove( removeKey );
                 keysList.remove( removeKey );
-
                 if (selectedMinorKeys.size() == 1) {
                     break;
                 }
@@ -376,9 +369,7 @@ public class BICT_fxmlController implements Initializable {
         }
 
         minorCourseForthisCareer.forEach( action -> {
-
             selectedMinorKeys.add( action.getCode() );
-
             action.setChosen( true );
 
             if (action.getName().equals( soft_dev_cb.getText() )) {
@@ -403,9 +394,11 @@ public class BICT_fxmlController implements Initializable {
         System.out.println( selectedMinorKeys.size() );
     }
 
+    /**
+     * Checks and remove ticks in cehckbox if more then 3 minors are selected
+     */
     private void devChecked() {
         if (selectedMinorKeys.size() == 3) {
-            //selectedMinorKeys.remove(selectedMinorKeys.)
             Object[] keys = selectedMinorKeys.toArray();
             String removeKey = (String) keys[keys.length - 1];
             if (minors.get( removeKey ).getName().equals( soft_dev_cb.getText() )) {
@@ -484,11 +477,14 @@ public class BICT_fxmlController implements Initializable {
 //                sourceButton.setSelected( true );
 //
 //
-    }
+        }
     }
 
+    /**
+     * Software Development selection logic for checkboxes
+     */
     @FXML
-    public void onSoftDevChecked(Event e) {
+    public void onSoftDevChecked() {
         devChecked();
 
         if (selectedMinorKeys.size() == 2 && soft_dev_cb.isSelected()) {
@@ -510,7 +506,7 @@ public class BICT_fxmlController implements Initializable {
             if (info_systems.isSelected()) {
                 info_systems.setDisable( true );
             } else info_systems.setDisable( false );
-
+            //testing
             System.out.println( selectedMinorKeys.size() );
         } else {
         }
@@ -540,13 +536,16 @@ public class BICT_fxmlController implements Initializable {
             if (info_systems.isSelected()) {
                 info_systems.setDisable( true );
             } else info_systems.setDisable( false );
-
+            //testing
             System.out.println( selectedMinorKeys.size() );
         }
     }
 
+    /**
+     * Telcom Networks selection logic for checkboxes
+     */
     @FXML
-    public void onTelcomChecked(Event e) {
+    public void onTelcomChecked() {
         devChecked();
 
         if (selectedMinorKeys.size() == 2 && telcoms_cb.isSelected()) {
@@ -561,8 +560,6 @@ public class BICT_fxmlController implements Initializable {
                 database_cb.setDisable( true );
             } else database_cb.setDisable( false );
 
-//                    if(telcoms_cb.isSelected()){ telcoms_cb.setDisable(true);}
-//                    else telcoms_cb.setDisable(false);
             if (game_prog_cb.isSelected()) {
                 game_prog_cb.setDisable( true );
             } else game_prog_cb.setDisable( false );
@@ -570,13 +567,16 @@ public class BICT_fxmlController implements Initializable {
             if (info_systems.isSelected()) {
                 info_systems.setDisable( true );
             } else info_systems.setDisable( false );
-
+            //testing
             System.out.println( selectedMinorKeys.size() );
         }
     }
 
+    /**
+     * Data Management selection logic for checkboxes
+     */
     @FXML
-    public void onDataMgmentChecked(Event e) {
+    public void onDataMgmentChecked() {
         devChecked();
 
         if (selectedMinorKeys.size() == 2 && database_cb.isSelected()) {
@@ -591,8 +591,6 @@ public class BICT_fxmlController implements Initializable {
                 telcoms_cb.setDisable( true );
             } else telcoms_cb.setDisable( false );
 
-//                    if(telcoms_cb.isSelected()){ telcoms_cb.setDisable(true);}
-//                    else telcoms_cb.setDisable(false);
             if (game_prog_cb.isSelected()) {
                 game_prog_cb.setDisable( true );
             } else game_prog_cb.setDisable( false );
@@ -600,13 +598,16 @@ public class BICT_fxmlController implements Initializable {
             if (info_systems.isSelected()) {
                 info_systems.setDisable( true );
             } else info_systems.setDisable( false );
-
+            //testing
             System.out.println( selectedMinorKeys.size() );
         }
     }
 
+    /**
+     * Information Systems selection logic for checkboxes
+     */
     @FXML
-    public void onInfoSystemsChecked(Event e) {
+    public void onInfoSystemsChecked() {
 
         devChecked();
 
@@ -622,8 +623,6 @@ public class BICT_fxmlController implements Initializable {
                 telcoms_cb.setDisable( true );
             } else telcoms_cb.setDisable( false );
 
-//                    if(telcoms_cb.isSelected()){ telcoms_cb.setDisable(true);}
-//                    else telcoms_cb.setDisable(false);
             if (game_prog_cb.isSelected()) {
                 game_prog_cb.setDisable( true );
             } else game_prog_cb.setDisable( false );
@@ -632,55 +631,59 @@ public class BICT_fxmlController implements Initializable {
                 database_cb.setDisable( true );
             } else database_cb.setDisable( false );
 
+            //testing
             System.out.println( selectedMinorKeys.size() );
         }
 
     }
 
-    private VBox displayCompulsoryMinors(){
+    /**
+     * @return returns vBox result
+     * Adds compulsory Minors to scene
+     */
+    private VBox displayCompulsoryMinors() {
 
-        VBox vb = new VBox(3);
+        VBox vb = new VBox( 3 );
 
-        compulsoryMinors = minors.get("BICT");//.getDownstream();
+        compulsoryMinors = minors.get( "BICT" );//.getDownstream();
         // String minorCourse =null;
-        compulsoryMinors.getDownstream().forEach(minor->{
-            HBox detailsHB = new HBox(10);
-            Course c = (Course)minor;
-            c.setChosen(true);
-            detailsHB.getChildren().addAll(new Button(c.getCode()),new Label("        "  ), new Label(c.getSemesters()));
-            vb.getChildren().add(detailsHB);
+        compulsoryMinors.getDownstream().forEach( minor -> {
+            HBox detailsHB = new HBox( 10 );
+            Course c = (Course) minor;
+            c.setChosen( true );
+            detailsHB.getChildren().addAll( new Button( c.getCode() ), new Label( "        " ), new Label( c.getSemesters() ) );
+            vb.getChildren().add( detailsHB );
 
-        });
+        } );
 
         return vb;
-
     }
 
-    private VBox displayOtherMinors(){
+    private VBox displayOtherMinors() {
 
 
-        VBox vbOther = new VBox(3);
+        VBox vbOther = new VBox( 3 );
 
-        otherMinors = minors.get("SD"  );//.getDownstream();
+        Option otherMinors = minors.get( "SD" );
         // String minorCourse =null;
-        otherMinors.getDownstream().forEach(minor->{
-            HBox detailsOtherM = new HBox(10);
-            Course cOther = (Course)minor;
+        otherMinors.getDownstream().forEach( minor -> {
+            HBox detailsOtherM = new HBox( 10 );
+            Course cOther = (Course) minor;
             ToggleButton tbCourses = new ToggleButton( cOther.getCode() );
-                    tbCourses.setOnAction( event -> {
-                        if (selectedCourses.isChosen()) {
-                            selectedCourses.setChosen(false);
-                        } else {
-                            selectedCourses.setChosen(true );
-                        }
+            tbCourses.setOnAction( event -> {
+                if (selectedCourses.isChosen()) {
+                    selectedCourses.setChosen( false );
+                } else {
+                    selectedCourses.setChosen( true );
+                }
 
-                            });
+            } );
 
-            cOther.setChosen(true);
-            detailsOtherM.getChildren().addAll(new Button(cOther.getCode()), new Label(cOther.getSemesters()));
-            vbOther.getChildren().add(detailsOtherM);
+            cOther.setChosen( true );
+            detailsOtherM.getChildren().addAll( new Button( cOther.getCode() ), new Label( cOther.getSemesters() ) );
+            vbOther.getChildren().add( detailsOtherM );
 
-        });
+        } );
 
         return vbOther;
 
