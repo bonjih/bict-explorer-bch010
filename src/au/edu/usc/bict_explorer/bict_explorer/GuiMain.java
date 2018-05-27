@@ -2,10 +2,20 @@ package au.edu.usc.bict_explorer.bict_explorer;
 
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
 import java.io.IOException;
 
 
@@ -28,12 +38,16 @@ public class GuiMain extends Application {
     public void start(Stage stage) throws IOException{
         Parent root = FXMLLoader.load(getClass().getResource("BICT_fxml.fxml"));
 
-
-
-
         Scene scene =new Scene(root);
+
+          // for testing of various heights and widths
+//        scene.widthProperty().addListener( (observableValue, oldSceneWidth, newSceneWidth) -> System.out.println("Width: " + newSceneWidth) );
+//        scene.heightProperty().addListener( (observableValue, oldSceneHeight, newSceneHeight) -> System.out.println("Height: " + newSceneHeight) );
+
         scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );
-        stage.setResizable(false);
+        stage.setMinWidth( 963 );
+        stage.setMinHeight( 671 );
+        stage.sizeToScene();
         stage.setScene(scene);
         stage.setTitle("BICT EXPLORER");
         stage.show();

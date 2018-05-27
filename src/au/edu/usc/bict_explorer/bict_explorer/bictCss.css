@@ -25,9 +25,11 @@
     -fx-pref-height: 23px;
 }
 
+.toggle-button {
+-fx-start-margin: 50;
 
 
-
+}
 
 .button:hover {
    -fx-background-color: green;

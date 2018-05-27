@@ -1,5 +1,6 @@
 package au.edu.usc.bict_explorer.bict_explorer;
 
+import au.edu.usc.bict_explorer.rules.Course;
 import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
 import javafx.application.Platform;
@@ -10,23 +11,24 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 /**
  * BICT (GUI) Controller class
@@ -51,9 +53,8 @@ public class BICT_fxmlController implements Initializable {
     String coursesChoice;
     Set<Option> minorCourseForthisCareer;
 
-    ObservableList<String> careerListItems = FXCollections.observableArrayList();
-//    ObservableList<String> courseListItems = FXCollections.observableArrayList();
 
+    ObservableList<String> careerListItems = FXCollections.observableArrayList();
 
     @FXML
     ListView<String> careersList;
@@ -88,15 +89,28 @@ public class BICT_fxmlController implements Initializable {
     @FXML
     private MenuItem onAbout;
 
-//    @FXML
-//    private AnchorPane minorBox;
-
     @FXML
     private FlowPane coursesBox;
+
+    @FXML
+    private Pane compulsoryMinorsPane;
+
+    @FXML
+    private Button confirmMinor;
+
+    @FXML
+    private FlowPane otherMinorsPane;
 
     //Map<String,CheckBox> checkBoxMap = new HashMap<>();
     //ObservableList<CheckBox> minorsCheckBox  = FXCollections.observableArrayList(soft_dev_cb,game_prog_cb,database_cb,telcom_net_cb);
     Set<String> selectedMinorKeys = new LinkedHashSet<>();
+    Stage stage = new Stage();
+
+    private final Map<Object, ToggleButton> courseMap = new HashMap<>();
+
+    private Option compulsoryMinors;
+    private Option otherMinors;
+
 
     /**
      * Initializes the controller class.
@@ -137,7 +151,14 @@ public class BICT_fxmlController implements Initializable {
         careersList.setItems( careerListItems );
 
         //compulsory minors
-        Set<Option> compulsoryMinors = minors.get( "BICT" ).getDownstream();
+//        Set<Option> compulsoryMinors = minors.get( "BICT" ).getDownstream();
+
+        //compulsory minors
+
+        compulsoryMinorsPane.getChildren().add(displayCompulsoryMinors());
+//        confirmMinor.setDisable(true);
+
+        otherMinorsPane.getChildren().add(displayOtherMinors());
 
         soft_dev_cb.setDisable( true );
         game_prog_cb.setDisable( true );
@@ -147,10 +168,12 @@ public class BICT_fxmlController implements Initializable {
 
         //soft_dev_cb.setE
         Iterator minorKeysIterator = minorKeys.iterator();
+
     }
 
     File dataFile = null;
     final FileChooser fileChooser = new FileChooser();
+    ToggleButton tbButton = new ToggleButton();
 
     @FXML
     void setOnfileOpenRequest(ActionEvent actionEvent) throws IOException, ParseException {
@@ -214,41 +237,62 @@ public class BICT_fxmlController implements Initializable {
 
     }
 
-
     @FXML
     void setOnCloseRequest() throws IOException, ParseException {
 
-        guiClose.setOnAction( t -> Platform.exit() );
-//        guiClose.setOnAction( t -> System.exit( 0 ) ); /// ***********TODO fix
+
+//        guiClose.setOnAction( t -> Platform.exit() );
+        guiClose.setOnAction( t -> System.exit( 0 ) ); /// ***********TODO fix
     }
 
     @FXML
     void setOnAboutRequest() throws IOException, ParseException {
         final TextArea textArea = new TextArea();
-        VBox vBoxPopup = new VBox( textArea );
+//        VBox vBoxPopup = new VBox( textArea );
+        FlowPane helpPopup = new FlowPane( textArea );
 
         try (Scanner sf = new Scanner( new File( "src/au/edu/usc/bict_explorer/bict_explorer/menuItemHelp.txt" ) )) {
 
 
-            String line = "/n";
+            while (sf.hasNext())
+                System.out.println(sf.next());
 
-            while (sf.hasNextLine())
-                line = sf.nextLine();
-
-            System.out.println( line );
+                String line = sf.next();
 
             textArea.appendText( line );
+//            textArea.requestFocus();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
+//        File file = new File( "src/au/edu/usc/bict_explorer/bict_explorer/menuItemHelp.txt" )
+//        public List<String> read(File file) {
+//
+//            List<String> lines = new ArrayList<String>();
+//            String line;
+//            try {
+//                BufferedReader br = new BufferedReader(new FileReader(file));
+//
+//                while ((line = br.readLine()) != null) {
+//                    lines.add(line);
+//                }
+//                br.close();
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return lines;
+//        }
+
         onAbout.setOnAction( new EventHandler<ActionEvent>() {
 
             public void handle(ActionEvent t) {
 
-                Stage stage = new Stage();
-                Scene newScenePopup = new Scene( vBoxPopup, 200, 100 );
+
+                Scene newScenePopup = new Scene( helpPopup, 300, 100 );
+
+
                 stage.setTitle( "Help" );
                 stage.setScene( newScenePopup );
                 stage.show();
@@ -295,7 +339,6 @@ public class BICT_fxmlController implements Initializable {
 
             }
         }
-
     }
 
     private void updateMinors(Option selectedCareer) {
@@ -313,6 +356,7 @@ public class BICT_fxmlController implements Initializable {
 
 //        System.out.println("******" + soft_dev_cb.getText());
         minorCourseForthisCareer = selectedCareer.getDownstream();
+        compulsoryMinors.setChosen(true);
 
         Object[] keys = selectedMinorKeys.toArray();
         ArrayList<Object> keysList = new ArrayList<>( Arrays.asList( keys ) );
@@ -328,9 +372,7 @@ public class BICT_fxmlController implements Initializable {
                 if (selectedMinorKeys.size() == 1) {
                     break;
                 }
-
             }
-
         }
 
         minorCourseForthisCareer.forEach( action -> {
@@ -381,10 +423,68 @@ public class BICT_fxmlController implements Initializable {
             System.out.println( selectedMinorKeys.size() );
         }
         // add courses to GUI
+
+//        private VBox displayOtherMinors(){
+//
+//            VBox vbOther = new VBox(3);
+//
+//            otherMinors = minors.get("SD");//.getDownstream();
+//            // String minorCourse =null;
+//            otherMinors.getDownstream().forEach(minor->{
+//                HBox detailsOtherM = new HBox(10);
+//                Course cOther = (Course)minor;
+//                cOther.setChosen(true);
+//                detailsOtherM.getChildren().addAll(new Button(cOther.getCode()), new Label(cOther.getSemesters()));
+//                vbOther.getChildren().add(detailsOtherM);
+//
+//            });
+//
+//            return vbOther;
+//
+//        }
+
         for (Map.Entry<String, Option> courseC : courses.entrySet()) {
-            Button btCourses = new Button( courseC.getValue().getCode() );
-            coursesBox.getChildren().add( btCourses );
-        }
+//            ToggleButton tbCourses = new ToggleButton( courseC.getValue().getCode() );
+//
+//
+//            courseMap.put(courseC, tbCourses);
+//            tbCourses.setOnAction( event -> {
+//                if (selectedCourses.isChosen()) {
+//                    selectedCourses.setChosen(false);
+//                } else {
+//                    selectedCourses.setChosen(true );
+//                }
+////                selectedCourses.setChosen(!selectedCourses.isChosen());
+////                updateCareers();
+//
+//            });
+//
+//            otherMinorsPane.setHgap( 10 );
+//            otherMinorsPane.setVgap( 10 );
+//            otherMinorsPane.getChildren().add(tbCourses );
+//
+//        }
+
+
+//    private void updateCareers() {
+//       myDegree.processChanges();
+//        for (Option course : courseMap.keySet()) {
+//            ToggleButton tbCourses = courseMap.get(course);
+//            tbCourses.setSelected( course.isChosen() );
+//        }
+//    }
+
+//
+//    public class buttonEventHandler implements EventHandler<ActionEvent> {
+//        @Override
+//        public void handle(ActionEvent event) {
+//         ToggleButton sourceButton = (ToggleButton) event.getSource();
+//
+//            if (!sourceButton.isSelected()) {
+//                sourceButton.setSelected( true );
+//
+//
+    }
     }
 
     @FXML
@@ -534,6 +634,55 @@ public class BICT_fxmlController implements Initializable {
 
             System.out.println( selectedMinorKeys.size() );
         }
+
+    }
+
+    private VBox displayCompulsoryMinors(){
+
+        VBox vb = new VBox(3);
+
+        compulsoryMinors = minors.get("BICT");//.getDownstream();
+        // String minorCourse =null;
+        compulsoryMinors.getDownstream().forEach(minor->{
+            HBox detailsHB = new HBox(10);
+            Course c = (Course)minor;
+            c.setChosen(true);
+            detailsHB.getChildren().addAll(new Button(c.getCode()),new Label("        "  ), new Label(c.getSemesters()));
+            vb.getChildren().add(detailsHB);
+
+        });
+
+        return vb;
+
+    }
+
+    private VBox displayOtherMinors(){
+
+
+        VBox vbOther = new VBox(3);
+
+        otherMinors = minors.get("SD"  );//.getDownstream();
+        // String minorCourse =null;
+        otherMinors.getDownstream().forEach(minor->{
+            HBox detailsOtherM = new HBox(10);
+            Course cOther = (Course)minor;
+            ToggleButton tbCourses = new ToggleButton( cOther.getCode() );
+                    tbCourses.setOnAction( event -> {
+                        if (selectedCourses.isChosen()) {
+                            selectedCourses.setChosen(false);
+                        } else {
+                            selectedCourses.setChosen(true );
+                        }
+
+                            });
+
+            cOther.setChosen(true);
+            detailsOtherM.getChildren().addAll(new Button(cOther.getCode()), new Label(cOther.getSemesters()));
+            vbOther.getChildren().add(detailsOtherM);
+
+        });
+
+        return vbOther;
 
     }
 
