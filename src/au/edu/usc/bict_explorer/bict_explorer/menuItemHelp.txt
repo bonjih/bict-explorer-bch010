@@ -1,0 +1,8 @@
+Program Operation:
+
+1) Select a Career 
+2) Select a 3rd minor and click confirm.
+3) Select one elective and click next.
+4) Select confirm to show your degree courses for the selected career.
+
+To clear your selection, click on any career.
