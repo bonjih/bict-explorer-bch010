@@ -30,12 +30,12 @@ public class GuiMain extends Application {
         Scene scene = new Scene( root );
 
         // for testing of various heights and widths
-//        scene.widthProperty().addListener( (observableValue, oldSceneWidth, newSceneWidth) -> System.out.println("Width: " + newSceneWidth) );
-//        scene.heightProperty().addListener( (observableValue, oldSceneHeight, newSceneHeight) -> System.out.println("Height: " + newSceneHeight) );
+        scene.widthProperty().addListener( (observableValue, oldSceneWidth, newSceneWidth) -> System.out.println("Width: " + newSceneWidth) );
+        scene.heightProperty().addListener( (observableValue, oldSceneHeight, newSceneHeight) -> System.out.println("Height: " + newSceneHeight) );
 
         scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );
-        stage.setMinWidth( 963 );
-        stage.setMinHeight( 671 );
+        stage.setMinWidth( 1550 );
+        stage.setMinHeight( 800 );
         stage.sizeToScene();
         stage.setScene( scene );
         stage.setTitle( "BICT EXPLORER" );

@@ -1,3 +1,4 @@
+
 package au.edu.usc.bict_explorer.bict_explorer;
 
 import au.edu.usc.bict_explorer.rules.Course;
@@ -8,17 +9,24 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +38,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static au.edu.usc.bict_explorer.bict_explorer.BICT_txt_explorer.downStreamCourse;
+
 /**
  * @author Ben Hamilton
  */
@@ -40,12 +50,12 @@ import java.util.logging.Logger;
  */
 
 public class BICT_fxmlController implements Initializable { //initialise the controller when created in the call to FXMLLoader.load
+
     Degree myDegree;
     Option selectedCareer;
-    Option selectedCourses;
-    File fileCareers;
-    File fileMinors;
-    File fileCourses;
+    File minorsFile;
+    File courseFile;
+    File careersFile;
     Map<String, Option> courses;
     Map<String, Option> careers;
     Map<String, Option> minors;
@@ -53,36 +63,39 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     Set<String> minorKeys;
     Set<String> coursesKeys;
     String careerChoice;
-    String coursesChoice;
-    Set<Option> minorCourseForthisCareer;
+    Set<Option> minorCourseForthisCareer = new LinkedHashSet<>();
+    private Button next;
+    private ObservableList<Node> node;
+    private VBox reportBox = new VBox( 1 );
+    List<String> minorCourse = new ArrayList<>();
 
-
-    /**
-     * Career observable list and used to listen when list changes
-     * Observability by wrapping lists with ObservableList.
-     */
     ObservableList<String> careerListItems = FXCollections.observableArrayList();
 
     @FXML
-    ListView<String> careersList;
+    ListView<String> careersListView;
+
+    ObservableList<String> compulsoryMinorsList = FXCollections.observableArrayList();
 
     @FXML
-    ListView<String> coursesList;
+    private Text minor1;
 
     @FXML
-    CheckBox soft_dev_cb;
+    private Text minor2;
 
     @FXML
-    CheckBox game_prog_cb;
+    private Text minor3;
 
     @FXML
-    CheckBox database_cb;
+    private ChoiceBox choiceBox;
 
     @FXML
-    CheckBox telcoms_cb;
+    private Button confirmMinor;
 
     @FXML
-    CheckBox info_systems;
+    private Pane compulsoryMinorsPane;
+
+    @FXML
+    private Pane reportPane;
 
     @FXML
     private MenuItem guiClose;
@@ -94,30 +107,23 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     private MenuItem fileSave;
 
     @FXML
-    private MenuItem onAbout;
-
-    @FXML
-    private FlowPane coursesBox;
-
-    @FXML
-    private Pane compulsoryMinorsPane;
-
-    @FXML
-    private Button confirmMinor;
-
-    @FXML
-    private FlowPane otherMinorsPane;
-
-    @FXML
     private Text errorStatus;
 
-    private final Map<Object, ToggleButton> courseMap = new HashMap<>();
+    ArrayList<String> extraMinors = new ArrayList<>();
+
+    ObservableList<String> choiceBoxItems = FXCollections.observableArrayList();
+
     private Option compulsoryMinors;
-    private Set<String> selectedMinorKeys = new LinkedHashSet<>();
-    private Stage stage = new Stage();
+
+    //ArrayList<String> selectedMinorCourses =new ArrayL
+    Set<String> selectedMinorKeys = new LinkedHashSet<>();
 
     /**
      * Initializes the controller class.
+     * <p>
+     * /**
+     * Career observable list and used to listen when list changes
+     * Observability by wrapping lists with ObservableList.
      *
      * @param url
      * @param rb
@@ -127,14 +133,12 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     public void initialize(URL url, ResourceBundle rb) {
 
         try {
-            // TODO File careersFile = new File(".....careers.options");
 
-            fileCareers = new File( "src/au/edu/usc/bict_explorer/resources/careers.options" );
-            fileMinors = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
-            fileCourses = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
+            minorsFile = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
+            courseFile = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
+            careersFile = new File( "src/au/edu/usc/bict_explorer/resources/careers.options" );
 
-            myDegree = new Degree( fileCareers, fileMinors, fileCourses );
-
+            myDegree = new Degree( careersFile, minorsFile, courseFile );
         } catch (IOException | ParseException ex) {
             Logger.getLogger( BICT_fxmlController.class.getName() ).log( Level.SEVERE, null, ex );
         }
@@ -147,30 +151,16 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         minorKeys = minors.keySet();
         coursesKeys = courses.keySet();
 
-        //career observables
         careers.entrySet().forEach( career -> {
             careerListItems.add( career.getValue().getName() );
         } );
-        careersList.setItems( careerListItems );
+        careersListView.setItems( careerListItems );
 
         //compulsory minors
-//        Set<Option> compulsoryMinors = minors.get( "BICT" ).getDownstream();
-
-        //compulsory minors
-
         compulsoryMinorsPane.getChildren().add( displayCompulsoryMinors() );
-//        confirmMinor.setDisable(true);
+        confirmMinor.setDisable( true );
 
-        otherMinorsPane.getChildren().add( displayOtherMinors() );
-
-        soft_dev_cb.setDisable( true );
-        game_prog_cb.setDisable( true );
-        database_cb.setDisable( true );
-        telcoms_cb.setDisable( true );
-        info_systems.setDisable( true );
-
-        //soft_dev_cb.setE
-        Iterator minorKeysIterator = minorKeys.iterator();
+        reportPane.getChildren().add( makeReportPane() );
 
     }
 
@@ -180,8 +170,8 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @throws IOException    to throw error if read file is incorrect.
-     * @throws ParseException if the given format (txt) is not supplied.
-     *                        Event handler for open file request.
+     * @throws ParseException if the given format (txt) is not supplied. Event
+     *                        handler for open file request.
      */
     @FXML
     void setOnfileOpenRequest() throws IOException, ParseException {
@@ -191,7 +181,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter( "Text Files", "*.txt" ),
                 new FileChooser.ExtensionFilter( "All Files", "*.*" ) );
-
 
         File savedFile = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
 
@@ -216,8 +205,8 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @throws IOException    to throw error if write to file error has occurred.
-     * @throws ParseException if the given format (txt) is not supplied.
-     *                        Event handler for save file request
+     * @throws ParseException if the given format (txt) is not supplied. Event
+     *                        handler for save file request
      */
     @FXML
     private void setOnfileSaveAsRequest() throws IOException, ParseException {
@@ -234,7 +223,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             try (PrintStream ps = new PrintStream( saveAsFile )) {
 
 //                ps.print( careersBox.getText() );
-
                 // saving the file for use by the fileSave
                 dataFile = saveAsFile;
 
@@ -260,8 +248,8 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @throws IOException    to throw error if txt file does not exist.
-     * @throws ParseException if the given format (txt) is not supplied.
-     * Event handler for 'about/help' menu'
+     * @throws ParseException if the given format (txt) is not supplied. Event
+     *                        handler for 'about/help' menu'
      */
     @FXML
     void setOnAboutRequest(ActionEvent event) throws IOException, ParseException {
@@ -273,15 +261,16 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
         errorStatus = new Text();
 
-         if (helpFile != null) {
+        if (helpFile != null) {
             try {
 
                 webView.getEngine().load( helpFile );
-                Scene scene = new Scene( webView  );
-                stage.setTitle( "Help Menu" );
-                stage.setResizable( false );
-                stage.setScene( scene );
-                stage.show();
+                Scene scene = new Scene( webView );
+
+//                stage.setTitle("Help Menu");
+//                stage.setResizable(false);
+//                stage.setScene(scene);
+//                stage.show();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -292,401 +281,331 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param e not used
-     * Mouse even handler for career selection
+     *          Mouse even handler for career selection
      */
     @FXML
     public void onCareerSelected(MouseEvent e) {
-
-        careerChoice = careersList.getSelectionModel().getSelectedItem();
-        String careerKey = null;
-        //write to file
-        int choiceCarrer = careersList.getSelectionModel().getSelectedIndex();
-//        System.out.println("***" + choice);
-        switch (choiceCarrer) {
-            //Analyst programmer
-            case 0:
-                careerKey = "AP";
-                break;
-            //Network analyst
-            case 1:
-                careerKey = "NA";
-                break;
-            //Database administrator
-            case 2:
-                careerKey = "DA";
-                break;
-            //Business Analyst
-            case 3:
-                careerKey = "BA";
-                break;
-
-            default:
+        if (!reportBox.getChildren().isEmpty()) {
+            reportBox.getChildren().clear();
+            reportBox.getChildren().add( makeReportPane() );
         }
 
-        for (String key : careerKeys) {
-            if (key.equals( careerKey )) {
-                selectedCareer = careers.get( key );
-                selectedCareer.setChosen( true );
+        // reportBox.getChildren().removeAll(reportBox.getChildren());
+        careers.entrySet().forEach( career -> {
+            career.getValue().setChosen( false );
+        } );
+
+        careerChoice = careersListView.getSelectionModel().getSelectedItem();
+
+        careers.entrySet().forEach( career -> {
+            if (career.getValue().getName().equals( careerChoice )) {
+                selectedCareer = career.getValue();
+
+                career.getValue().setChosen( true );
                 myDegree.processChanges();
-                myDegree.careers().get( key ).setChosen( true );
                 updateMinors( selectedCareer );
-
             }
-        }
+
+        } );
+
+        //write to file
+        next.setDisable( false );
+
     }
 
     /**
      * @param selectedCareer Unique code for a career
-     * Defines the properties when the minor checkbox is selected or not.
+     *                       Defines the properties when the minor checkbox is selected or not.
      */
-    private void updateMinors(Option selectedCareer) {
-        soft_dev_cb.setDisable( false );
-        game_prog_cb.setDisable( false );
-        database_cb.setDisable( false );
-        telcoms_cb.setDisable( false );
-        info_systems.setDisable( false );
-        soft_dev_cb.setSelected( false );
-        game_prog_cb.setSelected( false );
-        database_cb.setSelected( false );
-        info_systems.setSelected( false );
-        telcoms_cb.setSelected( false );
 
-        minorCourseForthisCareer = selectedCareer.getDownstream();
+    private void updateMinors(Option selectedCareer) {
+        // minorCourseForthisCareer.clear();
+        confirmMinor.setDisable( false );
+        extraMinors.clear();
+        choiceBoxItems.clear();
+        selectedMinorKeys.clear();
+        minor3.setText( "" );
+
+        //clearing all chosen fields
+        minors.entrySet().forEach( minor -> {
+            minor.getValue().setChosen( false );
+        } );
+
         compulsoryMinors.setChosen( true );
 
-        Object[] keys = selectedMinorKeys.toArray();
-        ArrayList<Object> keysList = new ArrayList<>( Arrays.asList( keys ) );
+//        List<String> minorCourse = new ArrayList<>();
+        minorCourse.clear();
+        minorCourseForthisCareer = selectedCareer.getDownstream();
 
-        if (selectedMinorKeys.size() > 2) {
-            while (selectedMinorKeys.size() > 1) {
-                String removeKey = (String) keysList.get( keysList.size() - 1 );
-                selectedMinorKeys.remove( removeKey );
-                keysList.remove( removeKey );
-                if (selectedMinorKeys.size() == 1) {
-                    break;
-                }
-            }
-        }
+        minorCourseForthisCareer.forEach( minor -> {
+            minor.setChosen( true );
+            minorCourse.add( minor.getName() );
+            selectedMinorKeys.add( minor.getCode() );
 
-        minorCourseForthisCareer.forEach( action -> {
-            selectedMinorKeys.add( action.getCode() );
-            action.setChosen( true );
+        } );
 
-            if (action.getName().equals( soft_dev_cb.getText() )) {
-                soft_dev_cb.setSelected( true );
-                soft_dev_cb.setDisable( true );
-                soft_dev_cb.setId( "bla" );
+        minor1.setText( minorCourse.get( 0 ) );
+        minor2.setText( minorCourse.get( 1 ) );
 
-            } else if (action.getName().equals( game_prog_cb.getText() )) {
-                game_prog_cb.setSelected( true );
-                game_prog_cb.setDisable( true );
-            } else if (action.getName().equals( database_cb.getText() )) {
-                database_cb.setSelected( true );
-                database_cb.setDisable( true );
-            } else if (action.getName().equals( info_systems.getText() )) {
-                info_systems.setSelected( true );
-                info_systems.setDisable( true );
-            } else if (action.getName().equals( telcoms_cb.getText() )) {
-                telcoms_cb.setSelected( true );
-                telcoms_cb.setDisable( true );
+        extraMinors = new ArrayList<>();
+
+        minors.entrySet().forEach( (Map.Entry<String, Option> minor) -> {
+
+            if (!minor.getValue().isChosen()) {
+                extraMinors.add( minor.getValue().getName() );
             }
         } );
-        System.out.println( selectedMinorKeys.size() );
+
+        choiceBoxItems.addAll( extraMinors );
+        choiceBox.setItems( choiceBoxItems );
+
     }
 
     /**
-     * Checks and remove ticks in cehckbox if more then 3 minors are selected
+     * @param e Confirm minor selection before viewing courses
      */
-    private void devChecked() {
-        if (selectedMinorKeys.size() == 3) {
-            Object[] keys = selectedMinorKeys.toArray();
-            String removeKey = (String) keys[keys.length - 1];
-            if (minors.get( removeKey ).getName().equals( soft_dev_cb.getText() )) {
-                soft_dev_cb.setSelected( false );
-            } else if (minors.get( removeKey ).getName().equals( game_prog_cb.getText() )) {
-                game_prog_cb.setSelected( false );
-            } else if (minors.get( removeKey ).getName().equals( database_cb.getText() )) {
-                database_cb.setSelected( false );
-            } else if (minors.get( removeKey ).getName().equals( telcoms_cb.getText() )) {
-                telcoms_cb.setSelected( false );
-            } else if (minors.get( removeKey ).getName().equals( info_systems.getText() )) {
-                info_systems.setSelected( false );
-            }
-            selectedMinorKeys.remove( removeKey );
-            System.out.println( selectedMinorKeys.size() );
-        }
-        // add courses to GUI
-
-//        private VBox displayOtherMinors(){
-//
-//            VBox vbOther = new VBox(3);
-//
-//            otherMinors = minors.get("SD");//.getDownstream();
-//            // String minorCourse =null;
-//            otherMinors.getDownstream().forEach(minor->{
-//                HBox detailsOtherM = new HBox(10);
-//                Course cOther = (Course)minor;
-//                cOther.setChosen(true);
-//                detailsOtherM.getChildren().addAll(new Button(cOther.getCode()), new Label(cOther.getSemesters()));
-//                vbOther.getChildren().add(detailsOtherM);
-//
-//            });
-//
-//            return vbOther;
-//
-//        }
-
-        for (Map.Entry<String, Option> courseC : courses.entrySet()) {
-//            ToggleButton tbCourses = new ToggleButton( courseC.getValue().getCode() );
-//
-//
-//            courseMap.put(courseC, tbCourses);
-//            tbCourses.setOnAction( event -> {
-//                if (selectedCourses.isChosen()) {
-//                    selectedCourses.setChosen(false);
-//                } else {
-//                    selectedCourses.setChosen(true );
-//                }
-////                selectedCourses.setChosen(!selectedCourses.isChosen());
-////                updateCareers();
-//
-//            });
-//
-//            otherMinorsPane.setHgap( 10 );
-//            otherMinorsPane.setVgap( 10 );
-//            otherMinorsPane.getChildren().add(tbCourses );
-//
-//        }
-
-
-//    private void updateCareers() {
-//       myDegree.processChanges();
-//        for (Option course : courseMap.keySet()) {
-//            ToggleButton tbCourses = courseMap.get(course);
-//            tbCourses.setSelected( course.isChosen() );
-//        }
-//    }
-
-//
-//    public class buttonEventHandler implements EventHandler<ActionEvent> {
-//        @Override
-//        public void handle(ActionEvent event) {
-//         ToggleButton sourceButton = (ToggleButton) event.getSource();
-//
-//            if (!sourceButton.isSelected()) {
-//                sourceButton.setSelected( true );
-//
-//
-        }
-    }
-
-    /**
-     * Software Development selection logic for checkboxes
-     */
-    @FXML
-    public void onSoftDevChecked() {
-        devChecked();
-
-        if (selectedMinorKeys.size() == 2 && soft_dev_cb.isSelected()) {
-            // String key=null;
-            selectedMinorKeys.add( "SD" );
-
-            if (game_prog_cb.isSelected()) {
-                game_prog_cb.setDisable( true );
-            } else game_prog_cb.setDisable( false );
-
-            if (database_cb.isSelected()) {
-                database_cb.setDisable( true );
-            } else database_cb.setDisable( false );
-
-            if (telcoms_cb.isSelected()) {
-                telcoms_cb.setDisable( true );
-            } else telcoms_cb.setDisable( false );
-
-            if (info_systems.isSelected()) {
-                info_systems.setDisable( true );
-            } else info_systems.setDisable( false );
-            //testing
-            System.out.println( selectedMinorKeys.size() );
-        } else {
-        }
-    }
 
     @FXML
-    public void onGameProgChecked(ActionEvent e) {
-        devChecked();
-        //System.out.println(" HELLO");
+    public void onConfirmMinor(MouseEvent e) {
 
-        if (selectedMinorKeys.size() == 2 && game_prog_cb.isSelected()) {
-            // String key=null;
-            selectedMinorKeys.add( "GP" );
+        selectedMinorKeys.clear();
+        minorCourseForthisCareer = selectedCareer.getDownstream();
 
-            if (soft_dev_cb.isSelected()) {
-                soft_dev_cb.setDisable( true );
-            } else soft_dev_cb.setDisable( false );
+        minorCourseForthisCareer.forEach( minor -> {
+            minor.setChosen( true );
+            minorCourse.add( minor.getName() );
+            selectedMinorKeys.add( minor.getCode() );
 
-            if (database_cb.isSelected()) {
-                database_cb.setDisable( true );
-            } else database_cb.setDisable( false );
+        } );
 
-            if (telcoms_cb.isSelected()) {
-                telcoms_cb.setDisable( true );
-            } else telcoms_cb.setDisable( false );
+        if (choiceBox.getValue() != null) {
 
-            if (info_systems.isSelected()) {
-                info_systems.setDisable( true );
-            } else info_systems.setDisable( false );
-            //testing
-            System.out.println( selectedMinorKeys.size() );
+            String value = (String) choiceBox.getValue();
+            minor3.setText( (String) choiceBox.getValue() );
+            minors.entrySet().forEach( minor -> {
+                if (value.equals( minor.getValue().getName() )) {
+                    selectedMinorKeys.add( minor.getValue().getCode() );
+                    minor.getValue().setChosen( true );
+                    myDegree.processChanges();
+                }
+            } );
+
         }
-    }
-
-    /**
-     * Telcom Networks selection logic for checkboxes
-     */
-    @FXML
-    public void onTelcomChecked() {
-        devChecked();
-
-        if (selectedMinorKeys.size() == 2 && telcoms_cb.isSelected()) {
-            // String key=null;
-            selectedMinorKeys.add( "TCN" );
-
-            if (soft_dev_cb.isSelected()) {
-                soft_dev_cb.setDisable( true );
-            } else soft_dev_cb.setDisable( false );
-
-            if (database_cb.isSelected()) {
-                database_cb.setDisable( true );
-            } else database_cb.setDisable( false );
-
-            if (game_prog_cb.isSelected()) {
-                game_prog_cb.setDisable( true );
-            } else game_prog_cb.setDisable( false );
-
-            if (info_systems.isSelected()) {
-                info_systems.setDisable( true );
-            } else info_systems.setDisable( false );
-            //testing
-            System.out.println( selectedMinorKeys.size() );
-        }
-    }
-
-    /**
-     * Data Management selection logic for checkboxes
-     */
-    @FXML
-    public void onDataMgmentChecked() {
-        devChecked();
-
-        if (selectedMinorKeys.size() == 2 && database_cb.isSelected()) {
-            // String key=null;
-            selectedMinorKeys.add( "DM" );
-
-            if (soft_dev_cb.isSelected()) {
-                soft_dev_cb.setDisable( true );
-            } else soft_dev_cb.setDisable( false );
-
-            if (telcoms_cb.isSelected()) {
-                telcoms_cb.setDisable( true );
-            } else telcoms_cb.setDisable( false );
-
-            if (game_prog_cb.isSelected()) {
-                game_prog_cb.setDisable( true );
-            } else game_prog_cb.setDisable( false );
-
-            if (info_systems.isSelected()) {
-                info_systems.setDisable( true );
-            } else info_systems.setDisable( false );
-            //testing
-            System.out.println( selectedMinorKeys.size() );
-        }
-    }
-
-    /**
-     * Information Systems selection logic for checkboxes
-     */
-    @FXML
-    public void onInfoSystemsChecked() {
-
-        devChecked();
-
-        if (selectedMinorKeys.size() == 2 && info_systems.isSelected()) {
-            // String key=null;
-            selectedMinorKeys.add( "IS" );
-
-            if (soft_dev_cb.isSelected()) {
-                soft_dev_cb.setDisable( true );
-            } else soft_dev_cb.setDisable( false );
-
-            if (telcoms_cb.isSelected()) {
-                telcoms_cb.setDisable( true );
-            } else telcoms_cb.setDisable( false );
-
-            if (game_prog_cb.isSelected()) {
-                game_prog_cb.setDisable( true );
-            } else game_prog_cb.setDisable( false );
-
-            if (database_cb.isSelected()) {
-                database_cb.setDisable( true );
-            } else database_cb.setDisable( false );
-
-            //testing
-            System.out.println( selectedMinorKeys.size() );
-        }
+        next.setDisable( false );
 
     }
 
     /**
-     * @return returns vBox result
-     * Adds compulsory Minors to scene
+     * Always displays compulsory subjects for any minor.
      */
     private VBox displayCompulsoryMinors() {
+        VBox vb = new VBox( 1 );
+        vb.getStyleClass().add( "pane" ); //returns an ObservableList.. to css path
 
-        VBox vb = new VBox( 3 );
+        HBox title = new HBox();
+        title.setPadding( new Insets( 0, 40, 0, 0 ) );
+        Label courseCode = new Label( "Code" );
+        courseCode.setPrefSize( 100, 5 );
+        courseCode.setTextFill( Color.rgb( 27, 43, 218 ) );
+        courseCode.setFont( Font.font( null, FontWeight.BOLD, 14) );
 
-        compulsoryMinors = minors.get( "BICT" );//.getDownstream();
-        // String minorCourse =null;
+        Label courseTitle = new Label( "Course Title" );
+        courseTitle.setPrefSize( 250, 5 );
+        courseTitle.setTextFill( Color.rgb( 27, 43, 218 ) );
+        courseTitle.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
+
+        Label semesters = new Label( "Semester" );
+        title.getChildren().addAll( courseCode, courseTitle, semesters );
+        semesters.setTextFill( Color.rgb( 27, 43, 218 ) );
+        semesters.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
+
+        vb.getChildren().add( title );
+        compulsoryMinors = minors.get( "BICT" );
+
         compulsoryMinors.getDownstream().forEach( minor -> {
-            HBox detailsHB = new HBox( 10 );
+            HBox detailsHB = new HBox();
             Course c = (Course) minor;
             c.setChosen( true );
-            detailsHB.getChildren().addAll( new Button( c.getCode() ), new Label( "        " ), new Label( c.getSemesters() ) );
+            Label codeButton = new Label( c.getCode() );
+            codeButton.setPrefSize( 75, 5 );
+
+            Label nameLabel = new Label( c.getName() );
+            nameLabel.setPrefSize( 275, 5 );
+
+            detailsHB.getChildren().addAll( codeButton, nameLabel, new Label( "        " ), new Label( c.getSemesters() ) );
             vb.getChildren().add( detailsHB );
 
         } );
 
+        vb.getChildren().add( new Label( "   " ) ); //for space
+        vb.getChildren().add( new Label( "Choose one elective:" ) );
+        vb.getChildren().add( new Label( "   " ) ); //for space
+
+        HBox hb1 = new HBox();
+        CheckBox cb1 = new CheckBox( "ICT341" );
+        Course choice1 = (Course) courses.get( cb1.getText() );
+        hb1.getChildren().addAll( cb1, new Label( choice1.getName() ), new Label( choice1.getSemesters() ) );
+
+        HBox hb2 = new HBox();
+        CheckBox cb2 = new CheckBox( "ICT342" );
+        Course choice2 = (Course) courses.get( cb2.getText() );
+        hb2.getChildren().addAll( cb2, new Label( choice2.getName() ), new Label( choice2.getSemesters() ) );
+        vb.getChildren().addAll( hb1, hb2 );
+
+        vb.getChildren().add( new Label( "   " ) ); //for space
+        next = new Button( "Next ->" );
+        next.setAlignment( Pos.BOTTOM_RIGHT );
+        next.setOnAction( e -> {
+            makeReport();
+        } );
+        vb.getChildren().add( next );
+
         return vb;
+
     }
 
-    private VBox displayOtherMinors() {
+    /**
+     * Makes report based pane
+     */
+    private VBox makeReportPane() {
+        if (!reportBox.getChildren().isEmpty()) {
+            reportBox.getChildren().clear();
+            reportBox.getChildren().add( makeReportPane() );
+        }
 
+        VBox content = new VBox();
 
-        VBox vbOther = new VBox( 3 );
+        Label minor = new Label( "BICT Minor" );
+        minor.setTextFill( Color.rgb( 27, 43, 218 ) );
+        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+        HBox title = new HBox();
+        Label code = new Label( "Code" );
+        code.setPrefSize( 50, 5 );
+        code.setTextFill( Color.rgb( 27, 43, 218 ) );
+        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
 
-        Option otherMinors = minors.get( "SD" );
-        // String minorCourse =null;
-        otherMinors.getDownstream().forEach( minor -> {
-            HBox detailsOtherM = new HBox( 10 );
-            Course cOther = (Course) minor;
-            ToggleButton tbCourses = new ToggleButton( cOther.getCode() );
-            tbCourses.setOnAction( event -> {
-                if (selectedCourses.isChosen()) {
-                    selectedCourses.setChosen( false );
-                } else {
-                    selectedCourses.setChosen( true );
-                }
+        Label courseTitle = new Label( "Title" );
+        courseTitle.setPrefSize( 300, 5 );
+        courseTitle.setTextFill( Color.rgb( 27, 43, 218 ) );
+        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+        Label sem = new Label( "Semesters" );
+        sem.setPrefSize( 75, 5 );
+        sem.setTextFill( Color.rgb( 27, 43, 218 ) );
+        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+        Label preq = new Label( "Prerequisites" );
+        preq.setPrefSize( 230, 5 );
+        preq.setTextFill( Color.rgb( 27, 43, 218 ) );
+        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+        Label satisfied = new Label( "Satisfied" );
+        satisfied.setTextFill( Color.rgb( 27, 43, 218 ) );
+        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
 
+        title.getChildren().addAll( code, courseTitle, sem, preq, satisfied );
+
+        content.getChildren().addAll( minor, title );
+
+        return content;
+    }
+
+    /**
+     * Makes the report based on user selection.
+     */
+
+    private void makeReport() {
+        if (!reportBox.getChildren().isEmpty()) {
+            reportBox.getChildren().clear();
+            reportBox.getChildren().add( makeReportPane() );
+        }
+
+        if (selectedMinorKeys.size() == 2) {
+            //Alert dialog
+            Alert alert = new Alert( AlertType.INFORMATION );
+            alert.setTitle( "BICT Minor" );
+            alert.setContentText( "You must pick an an extra BICT minor" );
+            alert.show();
+
+        } else {
+
+            next.setDisable( true );
+            node = reportPane.getChildren();
+            reportBox = (VBox) node.get( node.size() - 1 );
+
+            Set<Option> minorsOptionsSet = new HashSet<>();
+
+            Option minorOption;// = new Option();
+            //this is where the keys are read and assigned to options
+            Iterator minorKeyIterator = selectedMinorKeys.iterator();
+            while (minorKeyIterator.hasNext()) {
+                minorOption = (Option) minors.get( (String) minorKeyIterator.next() );
+                boolean add;
+                add = minorsOptionsSet.add( minorOption );
+            }
+
+            Set<String> selectedCoursesKeys = new HashSet<>();
+            Map<String, Course> myCourses = new HashMap<>();
+
+            minorsOptionsSet.forEach( (Option action) -> {
+
+                downStreamCourse = action.getDownstream();
+
+                downStreamCourse.forEach( member -> {
+
+                    // bictOut.println(member.getCode()+" "+ member.getName());
+                    selectedCoursesKeys.add( member.getCode() );
+                    myCourses.put( member.getCode(), (Course) courses.get( member.getCode() ) );
+                    member.setChosen( true );
+                } );
+
+                action.setChosen( true );
             } );
 
-            cOther.setChosen( true );
-            detailsOtherM.getChildren().addAll( new Button( cOther.getCode() ), new Label( cOther.getSemesters() ) );
-            vbOther.getChildren().add( detailsOtherM );
+            Map<String, Course> pre = new HashMap<>();
 
-        } );
+            myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
 
-        return vbOther;
+                HBox hb = new HBox( 20 );
+                String preRequisites = course.getValue().getPreReqs().toString();
+
+                Label code = new Label( course.getValue().getCode() );
+                code.setPrefSize( 50, 5 );
+
+                Label name = new Label( course.getValue().getName() );
+                name.setPrefSize( 300, 5 );
+
+                Label sem = new Label( course.getValue().getSemesters() );
+                sem.setPrefSize( 50, 5 );
+
+                Label preQ = new Label( preRequisites );
+                preQ.setPrefSize( 200, 5 );
+
+
+                ImageView satisfiedIcon = new ImageView();
+                satisfiedIcon.setFitHeight(15);
+                satisfiedIcon.setFitWidth(15);
+
+                if (course.getValue().isSatisfied(myCourses)) {
+
+                    Image satisfiedImage = new Image("src/au/edu/usc/bict_explorer/resources/tick.png");
+
+                    Tooltip tip = new Tooltip("Prerequisites satisfied");
+                    Tooltip.install(satisfiedIcon, tip);
+                    satisfiedIcon.setImage(satisfiedImage);
+
+                    hb.getChildren().addAll(code, name, sem, preQ, satisfiedIcon);
+
+                } else {
+                    Image dissatisfiedImage = new Image("src/au/edu/usc/bict_explorer/resources/wrong.png");
+                    Tooltip tip = new Tooltip("Prerequisites not satisfied");
+                    Tooltip.install(satisfiedIcon, tip);
+                    satisfiedIcon.setImage(dissatisfiedImage);
+
+                    hb.getChildren().addAll(code, name, sem, preQ, satisfiedIcon);
+                    // hb.getChildren().addAll(new Label(course.getValue().getCode()),new Label(course.getValue().getName()),new Label(course.getValue().getSemesters()),new Label(preRequisites),new Label("NOT OK"));
+                }
+
+                reportBox.getChildren().add( hb );
+            } );
+        }
 
     }
-
 }

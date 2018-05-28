@@ -29,7 +29,6 @@ public class BICT_txt_explorer {
     static Option selectedCareer;
 
     /**
-     * @param stage
      * @param args  the command line arguments
      * @throws java.io.FileNotFoundException
      */
@@ -42,7 +41,7 @@ public class BICT_txt_explorer {
 
         PrintWriter bictOut = new PrintWriter( file );
         try {
-            // TODO code application logic here\
+
             File fileCareers = new File( "src/au/edu/usc/bict_explorer/resources/careers.options" );
             File fileMinors = new File( "src/au/edu/usc/bict_explorer/resources/minors.options" );
             File fileCourses = new File( "src/au/edu/usc/bict_explorer/resources/courses.options" );
