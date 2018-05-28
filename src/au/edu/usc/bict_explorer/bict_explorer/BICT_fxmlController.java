@@ -6,7 +6,6 @@ import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -27,7 +26,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-
+import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,7 +40,7 @@ import java.util.logging.Logger;
 import static au.edu.usc.bict_explorer.bict_explorer.BICT_txt_explorer.downStreamCourse;
 
 /**
- * @author Ben Hamilton
+ * @author Ben Hamilton (aka bonjih)
  */
 
 /**
@@ -73,8 +72,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     @FXML
     ListView<String> careersListView;
-
-    ObservableList<String> compulsoryMinorsList = FXCollections.observableArrayList();
 
     @FXML
     private Text minor1;
@@ -115,13 +112,10 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     private Option compulsoryMinors;
 
-    //ArrayList<String> selectedMinorCourses =new ArrayL
     Set<String> selectedMinorKeys = new LinkedHashSet<>();
 
     /**
      * Initializes the controller class.
-     * <p>
-     * /**
      * Career observable list and used to listen when list changes
      * Observability by wrapping lists with ObservableList.
      *
@@ -166,7 +160,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     File dataFile = null;
     final FileChooser fileChooser = new FileChooser();
-    ToggleButton tbButton = new ToggleButton();
 
     /**
      * @throws IOException    to throw error if read file is incorrect.
@@ -252,7 +245,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
      *                        handler for 'about/help' menu'
      */
     @FXML
-    void setOnAboutRequest(ActionEvent event) throws IOException, ParseException {
+    void setOnAboutRequest() throws IOException, ParseException {
         String helpFile = new File( "src/au/edu/usc/bict_explorer/bict_explorer/menuItemHelp.txt" ).toURI().toURL().toExternalForm();
 
         WebView webView = new WebView();
@@ -266,11 +259,11 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
                 webView.getEngine().load( helpFile );
                 Scene scene = new Scene( webView );
-
-//                stage.setTitle("Help Menu");
-//                stage.setResizable(false);
-//                stage.setScene(scene);
-//                stage.show();
+                Stage stage = new Stage(  );
+                stage.setTitle("Help Menu");
+                stage.setResizable(false);
+                stage.setScene(scene);
+                stage.show();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -291,17 +284,15 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         }
 
         // reportBox.getChildren().removeAll(reportBox.getChildren());
-        careers.entrySet().forEach( career -> {
-            career.getValue().setChosen( false );
-        } );
+        careers.forEach( (key, value) -> value.setChosen( false ) );
 
         careerChoice = careersListView.getSelectionModel().getSelectedItem();
 
-        careers.entrySet().forEach( career -> {
-            if (career.getValue().getName().equals( careerChoice )) {
-                selectedCareer = career.getValue();
+        careers.forEach( (key, value) -> {
+            if (value.getName().equals( careerChoice )) {
+                selectedCareer = value;
 
-                career.getValue().setChosen( true );
+                value.setChosen( true );
                 myDegree.processChanges();
                 updateMinors( selectedCareer );
             }
@@ -315,11 +306,12 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param selectedCareer Unique code for a career
-     *                       Defines the properties when the minor checkbox is selected or not.
+     *  Defines the properties when the minor checkbox is selected or not.
      */
 
     private void updateMinors(Option selectedCareer) {
         // minorCourseForthisCareer.clear();
+
         confirmMinor.setDisable( false );
         extraMinors.clear();
         choiceBoxItems.clear();
@@ -327,13 +319,10 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         minor3.setText( "" );
 
         //clearing all chosen fields
-        minors.entrySet().forEach( minor -> {
-            minor.getValue().setChosen( false );
-        } );
+        minors.forEach( (key, value) -> value.setChosen( false ) );
 
         compulsoryMinors.setChosen( true );
 
-//        List<String> minorCourse = new ArrayList<>();
         minorCourse.clear();
         minorCourseForthisCareer = selectedCareer.getDownstream();
 
@@ -349,10 +338,10 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
         extraMinors = new ArrayList<>();
 
-        minors.entrySet().forEach( (Map.Entry<String, Option> minor) -> {
+        minors.forEach( (key, value) -> {
 
-            if (!minor.getValue().isChosen()) {
-                extraMinors.add( minor.getValue().getName() );
+            if (!value.isChosen()) {
+                extraMinors.add( value.getName() );
             }
         } );
 
@@ -370,7 +359,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
         selectedMinorKeys.clear();
         minorCourseForthisCareer = selectedCareer.getDownstream();
-
         minorCourseForthisCareer.forEach( minor -> {
             minor.setChosen( true );
             minorCourse.add( minor.getName() );
@@ -382,17 +370,15 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
             String value = (String) choiceBox.getValue();
             minor3.setText( (String) choiceBox.getValue() );
-            minors.entrySet().forEach( minor -> {
-                if (value.equals( minor.getValue().getName() )) {
-                    selectedMinorKeys.add( minor.getValue().getCode() );
-                    minor.getValue().setChosen( true );
+            minors.forEach( (key, value1) -> {
+                if (value.equals( value1.getName() )) {
+                    selectedMinorKeys.add( value1.getCode() );
+                    value1.setChosen( true );
                     myDegree.processChanges();
                 }
             } );
-
         }
         next.setDisable( false );
-
     }
 
     /**
@@ -407,7 +393,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         Label courseCode = new Label( "Code" );
         courseCode.setPrefSize( 100, 5 );
         courseCode.setTextFill( Color.rgb( 27, 43, 218 ) );
-        courseCode.setFont( Font.font( null, FontWeight.BOLD, 14) );
+        courseCode.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
 
         Label courseTitle = new Label( "Course Title" );
         courseTitle.setPrefSize( 250, 5 );
@@ -420,6 +406,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         semesters.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
 
         vb.getChildren().add( title );
+
         compulsoryMinors = minors.get( "BICT" );
 
         compulsoryMinors.getDownstream().forEach( minor -> {
@@ -455,9 +442,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         vb.getChildren().add( new Label( "   " ) ); //for space
         next = new Button( "Next ->" );
         next.setAlignment( Pos.BOTTOM_RIGHT );
-        next.setOnAction( e -> {
-            makeReport();
-        } );
+        next.setOnAction( e -> makeReport() );
         vb.getChildren().add( next );
 
         return vb;
@@ -465,7 +450,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     /**
-     * Makes report based pane
+     * Creates report based pane
      */
     private VBox makeReportPane() {
         if (!reportBox.getChildren().isEmpty()) {
@@ -488,10 +473,12 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         courseTitle.setPrefSize( 300, 5 );
         courseTitle.setTextFill( Color.rgb( 27, 43, 218 ) );
         minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+
         Label sem = new Label( "Semesters" );
         sem.setPrefSize( 75, 5 );
         sem.setTextFill( Color.rgb( 27, 43, 218 ) );
         minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+
         Label preq = new Label( "Prerequisites" );
         preq.setPrefSize( 230, 5 );
         preq.setTextFill( Color.rgb( 27, 43, 218 ) );
@@ -550,7 +537,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
                 downStreamCourse.forEach( member -> {
 
-                    // bictOut.println(member.getCode()+" "+ member.getName());
                     selectedCoursesKeys.add( member.getCode() );
                     myCourses.put( member.getCode(), (Course) courses.get( member.getCode() ) );
                     member.setChosen( true );
@@ -559,20 +545,18 @@ public class BICT_fxmlController implements Initializable { //initialise the con
                 action.setChosen( true );
             } );
 
-            Map<String, Course> pre = new HashMap<>();
-
-            myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
+             myCourses.forEach( (key, value) -> {
 
                 HBox hb = new HBox( 20 );
-                String preRequisites = course.getValue().getPreReqs().toString();
+                String preRequisites = value.getPreReqs().toString();
 
-                Label code = new Label( course.getValue().getCode() );
+                Label code = new Label( value.getCode() );
                 code.setPrefSize( 50, 5 );
 
-                Label name = new Label( course.getValue().getName() );
+                Label name = new Label( value.getName() );
                 name.setPrefSize( 300, 5 );
 
-                Label sem = new Label( course.getValue().getSemesters() );
+                Label sem = new Label( value.getSemesters() );
                 sem.setPrefSize( 50, 5 );
 
                 Label preQ = new Label( preRequisites );
@@ -580,32 +564,31 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
 
                 ImageView satisfiedIcon = new ImageView();
-                satisfiedIcon.setFitHeight(15);
-                satisfiedIcon.setFitWidth(15);
+                satisfiedIcon.setFitHeight( 15 );
+                satisfiedIcon.setFitWidth( 15 );
 
-                if (course.getValue().isSatisfied(myCourses)) {
+                if (value.isSatisfied( myCourses )) {
 
-                    Image satisfiedImage = new Image("src/au/edu/usc/bict_explorer/resources/tick.png");
+                    Image satisfiedImage = new Image( "https://upload.wikimedia.org/wikipedia/en/e/e4/Green_tick.png" );
 
-                    Tooltip tip = new Tooltip("Prerequisites satisfied");
-                    Tooltip.install(satisfiedIcon, tip);
-                    satisfiedIcon.setImage(satisfiedImage);
+                    Tooltip tip = new Tooltip( "Prerequisites satisfied" );
+                    Tooltip.install( satisfiedIcon, tip );
+                    satisfiedIcon.setImage( satisfiedImage );
 
-                    hb.getChildren().addAll(code, name, sem, preQ, satisfiedIcon);
+                    hb.getChildren().addAll( code, name, sem, preQ, satisfiedIcon );
 
                 } else {
-                    Image dissatisfiedImage = new Image("src/au/edu/usc/bict_explorer/resources/wrong.png");
-                    Tooltip tip = new Tooltip("Prerequisites not satisfied");
-                    Tooltip.install(satisfiedIcon, tip);
-                    satisfiedIcon.setImage(dissatisfiedImage);
+                    Image dissatisfiedImage = new Image( "https://upload.wikimedia.org/wikipedia/commons/7/7e/Red_x.png" );
+                    Tooltip tip = new Tooltip( "Prerequisites not satisfied" );
+                    Tooltip.install( satisfiedIcon, tip );
+                    satisfiedIcon.setImage( dissatisfiedImage );
 
-                    hb.getChildren().addAll(code, name, sem, preQ, satisfiedIcon);
+                    hb.getChildren().addAll( code, name, sem, preQ, satisfiedIcon );
                     // hb.getChildren().addAll(new Label(course.getValue().getCode()),new Label(course.getValue().getName()),new Label(course.getValue().getSemesters()),new Label(preRequisites),new Label("NOT OK"));
                 }
 
                 reportBox.getChildren().add( hb );
             } );
         }
-
     }
 }

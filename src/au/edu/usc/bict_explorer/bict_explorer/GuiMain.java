@@ -34,7 +34,7 @@ public class GuiMain extends Application {
         scene.heightProperty().addListener( (observableValue, oldSceneHeight, newSceneHeight) -> System.out.println("Height: " + newSceneHeight) );
 
         scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );
-        stage.setMinWidth( 1550 );
+        stage.setMinWidth( 1557);
         stage.setMinHeight( 800 );
         stage.sizeToScene();
         stage.setScene( scene );
