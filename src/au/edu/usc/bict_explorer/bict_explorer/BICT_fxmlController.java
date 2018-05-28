@@ -283,7 +283,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             reportBox.getChildren().add( makeReportPane() );
         }
 
-        // reportBox.getChildren().removeAll(reportBox.getChildren());
         careers.forEach( (key, value) -> value.setChosen( false ) );
 
         careerChoice = careersListView.getSelectionModel().getSelectedItem();
