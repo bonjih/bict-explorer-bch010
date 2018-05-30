@@ -18,14 +18,16 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="740.0" prefWidth="1405.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="au.edu.usc.bict_explorer.bict_explorer.BICT_fxmlController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="800.0" prefWidth="1405.0" xmlns="http://javafx.com/javafx/9.0.1"
+            fx:controller="au.edu.usc.bict_explorer.bict_explorer.BICT_fxmlController">
 
    <children>
       <BorderPane layoutY="2.0" prefHeight="676.0" prefWidth="1200.0">
          <center>
              <Pane fx:id="elective" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="490.0" BorderPane.alignment="CENTER">
                   <children>
-                        <Label layoutX="20.0" layoutY="2.0" text="Career Minor" textFill="#1b2bda">
+                      <Label layoutX="35.0" layoutY="2.0" text="Career Minor" textFill="#1b2bda">
                      <font>
                         <Font name="System Bold" size="19.0" />
                      </font></Label>
@@ -43,7 +45,7 @@
                      </font></Text>
                   <Label layoutX="150.0" layoutY="235.0" text="Compulsory Courses" textAlignment="CENTER" textFill="#1b2bda">
                      <font>
-                        <Font name="Rockwell Bold" size="17.0" />
+                         <Font name="Arial Bold" size="17.0"/>
                      </font>
                   </Label>
                   <Pane fx:id="compulsoryMinorsPane" layoutX="10.0" layoutY="260.0" prefHeight="404.0" prefWidth="200.0" />
@@ -87,28 +89,20 @@
                         <Font name="Arial Bold" size="15.0" />
                      </font>
                   </Label>
-                  <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="308.0" prefHeight="230.0" prefWidth="644.0" style="-fx-background-color: #c6c9b5;">
-                     <children>
-                        <Label layoutX="313.0" layoutY="13.0" prefHeight="30.0" prefWidth="74.0" text="Details" textFill="#1b2bda">
-                           <font>
-                              <Font name="Arial Bold" size="20.0" />
-                           </font>
-                           <VBox.margin>
-                              <Insets left="150.0" />
-                           </VBox.margin>
-                        </Label>
-                     </children>
-                  </Pane>
-                  <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code" textFill="#1b2bda">
+                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="342.0" prefHeight="196.0" prefWidth="644.0"
+                         style="-fx-background-color: #c6c9b5;"/>
+                   <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
+                          textFill="#1b2bda">
+                       <font>
+                           <Font name="Arial Bold" size="15.0"/>
+                       </font>
+                   </Label>
+                   <Label layoutX="296.0" layoutY="309.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
+                          textFill="#1b2bda">
                      <font>
-                        <Font name="Arial Bold" size="15.0" />
+                         <Font name="Arial Bold" size="20.0"/>
                      </font>
                   </Label>
-                  <ImageView fitHeight="28.0" fitWidth="200.0" layoutX="50.0" layoutY="51.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../resources/newlogo.png" />
-                     </image>
-                  </ImageView>
                </children></Pane>
          </right>
          <left>
@@ -192,12 +186,15 @@
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-      <Button fx:id="reportButton" layoutX="1244.0" layoutY="590.0" mnemonicParsing="false" onAction="#printReportClicked" prefHeight="25.0" prefWidth="112.0" style="-fx-background-color: lightgray;" text="Print Report" textFill="MEDIUMBLUE">
+       <Button fx:id="reportButton" layoutX="1238.0" layoutY="590.0" mnemonicParsing="false"
+               onAction="#printReportClicked" prefHeight="25.0" prefWidth="112.0"
+               style="-fx-background-color: lightgray;" text="Print Report" textFill="MEDIUMBLUE">
          <font>
             <Font name="Baskerville Old Face" size="15.0" />
          </font>
       </Button>
-      <TextField fx:id="nameTextField" layoutX="1066.0" layoutY="583.0" promptText="enter your name" style="-fx-background-color: lightgray;" stylesheets="@bictCss.css" />
+       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="583.0" promptText="enter your name"
+                  style="-fx-background-color: lightgray;" stylesheets="@bictCss.css"/>
       <ImageView fitHeight="107.0" fitWidth="177.0" layoutY="586.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/newlogo2.png" />
