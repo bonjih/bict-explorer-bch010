@@ -300,9 +300,8 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         }
     }
 
-
     /**
-     * @param object
+     * @param object creates source
      * Provides the description of each minor
      *
      */
@@ -344,10 +343,14 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         }
     }
 
+    /**
+     * the following functions are for the elective selections 1-6.
+     * No the best implementation as there is duplicate code
+     */
     @FXML
-    public void onElective1selected(Event e) {
+    public void onElective1selected() {
         if (elective1.isSelected()) {
-            elective1.setStyle( "-fx-background-color:#000000" );
+            elective1.setStyle( "-fx-background-color:#c6e519" );
             selectedElective = elective1.getText();
             courses.entrySet().forEach( course -> {
                 if (course.getValue().getName().equals( selectedElective )) {
@@ -365,7 +368,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     @FXML
-    public void onElective2selected(Event e) {
+    public void onElective2selected() {
         if (elective2.isSelected()) {
             elective2.setStyle( "-fx-background-color:#c6e519" );
             selectedElective = elective2.getText();
@@ -385,7 +388,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     @FXML
-    public void onElective3selected(Event e) {
+    public void onElective3selected() {
         if (elective3.isSelected()) {
             elective3.setStyle( "-fx-background-color:#c6e519" );
             selectedElective = elective3.getText();
@@ -405,7 +408,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     @FXML
-    public void onElective4selected(Event e) {
+    public void onElective4selected() {
         if (elective4.isSelected()) {
             elective4.setStyle( "-fx-background-color:#c6e519" );
             selectedElective = elective4.getText();
@@ -426,7 +429,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     @FXML
-    public void onElective5selected(Event e) {
+    public void onElective5selected() {
         if (elective5.isSelected()) {
             elective5.setStyle( "-fx-background-color:#c6e519" );
             selectedElective = elective5.getText();
@@ -447,7 +450,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     @FXML
-    public void onElective6selected(Event e) {
+    public void onElective6selected() {
         if (elective6.isSelected()) {
             elective6.setStyle( "-fx-background-color:#c6e519" );
             selectedElective = elective6.getText();
@@ -466,8 +469,11 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         elective5.setStyle( "-fx-background-color:#94baf7" );
     }
 
+    /**
+     * Method for selecting a career and then stores into careerchoice
+     */
     @FXML
-    public void onCareerSelected(MouseEvent e) {
+    public void onCareerSelected() {
         if (!reportBox.getChildren().isEmpty()) {
             reportBox.getChildren().clear();
         }
@@ -494,6 +500,11 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         makeDetailsBox( selectedCareer );
     }
 
+    /**
+     * @param currentCareerOption loads course details for Options and stores in param
+     *                            <p>
+     *                            setups  Options detailsbox and publishes course selected details
+     */
     private void makeDetailsBox(Option currentCareerOption) {
         //   if(currentCareerOption.getClass()==Option){}
         if (!detailsBox.getChildren().isEmpty()) {
@@ -601,20 +612,23 @@ public class BICT_fxmlController implements Initializable { //initialise the con
      /**
      * @return vb - VBox content
       * Displays compulsory subjects for any minor.
-     */
+      */
+
+     // in my effort to reduce redundant code prefWidth/height is common across all.
+     // this has effected overall layout
      private VBox displayCompulsoryMinors() {
         VBox vb = new VBox( 1 );
         vb.getStyleClass().add( "pane" );
 
         HBox title = new HBox();
-        title.setPadding( new Insets( 0, 40, 0, 0 ) );
-        Label courseCode = new Label( "CODE" );
+         title.setPadding( new Insets( 0, 40, 0, 0 ) );
+        Label courseCode = new Label( "Course Code" );
         courseCode.setPrefSize( 100, 5 );
 
         Label courseTitle = new Label( "Course Title" );
-        courseTitle.setPrefSize( 250, 5 );
+         courseTitle.setPrefSize( 250, 5 );
 
-        title.getChildren().addAll( courseCode, courseTitle, new Label( "SEMESTERS" ) );
+         title.getChildren().addAll( courseCode, courseTitle, new Label( "Semesters" ) );
         vb.getChildren().add( title );
         compulsoryMinors = minors.get( "BICT" );
 
@@ -663,11 +677,11 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         vb.getChildren().add( next );
 
         return vb;
-    }
+     }
 
     /**
      * @param code used to hold course code
-     *   Creates Course deatails view
+     *   Creates Course details view
      */
     private void makeCourseDetailsBox(String code) {
 

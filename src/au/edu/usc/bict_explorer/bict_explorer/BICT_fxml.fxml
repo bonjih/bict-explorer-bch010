@@ -43,12 +43,14 @@
                      <font>
                         <Font name="Arial" size="16.0" />
                      </font></Text>
-                  <Label layoutX="150.0" layoutY="235.0" text="Compulsory Courses" textAlignment="CENTER" textFill="#1b2bda">
+                      <Label layoutX="150.0" layoutY="238.0" text="Compulsory Courses" textAlignment="CENTER"
+                             textFill="#1b2bda">
                      <font>
                          <Font name="Arial Bold" size="17.0"/>
                      </font>
                   </Label>
-                  <Pane fx:id="compulsoryMinorsPane" layoutX="10.0" layoutY="260.0" prefHeight="404.0" prefWidth="200.0" />
+                      <Pane fx:id="compulsoryMinorsPane" layoutX="10.0" layoutY="275.0" prefHeight="389.0"
+                            prefWidth="200.0"/>
                   <Label layoutX="302.0" layoutY="1.0" prefHeight="22.0" prefWidth="89.0" text="Electives" textFill="#1b2bda">
                      <font>
                         <Font name="Arial Bold" size="20.0" />
@@ -89,7 +91,7 @@
                         <Font name="Arial Bold" size="15.0" />
                      </font>
                   </Label>
-                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="388.0" prefHeight="5.0" prefWidth="650.0"
+                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="366.0" prefHeight="5.0" prefWidth="650.0"
                          style="-fx-background-color: #c6c9b5;"/>
                    <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
                           textFill="#1b2bda">
@@ -97,7 +99,7 @@
                            <Font name="Arial Bold" size="15.0"/>
                        </font>
                    </Label>
-                   <Label layoutX="296.0" layoutY="353.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
+                   <Label layoutX="296.0" layoutY="331.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
                           textFill="#1b2bda">
                      <font>
                          <Font name="Arial Bold" size="20.0"/>
