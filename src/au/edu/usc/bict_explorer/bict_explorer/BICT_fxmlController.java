@@ -347,7 +347,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     @FXML
     public void onElective1selected(Event e) {
         if (elective1.isSelected()) {
-            elective1.setStyle( "-fx-background-color:#c6e519" );
+            elective1.setStyle( "-fx-background-color:#000000" );
             selectedElective = elective1.getText();
             courses.entrySet().forEach( course -> {
                 if (course.getValue().getName().equals( selectedElective )) {
@@ -744,7 +744,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             //this is where the keys are read and assigned to options
             Iterator minorKeyIterator = selectedMinorKeys.iterator();
             while (minorKeyIterator.hasNext()) {
-                minorOption = (Option) minors.get( (String) minorKeyIterator.next() );
+                minorOption = minors.get( minorKeyIterator.next() );
                 boolean add;
                 add = minorsOptionsSet.add( minorOption );
             }

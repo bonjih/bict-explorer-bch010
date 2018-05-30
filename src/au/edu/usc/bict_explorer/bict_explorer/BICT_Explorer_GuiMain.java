@@ -17,7 +17,11 @@ import java.util.Set;
 
 /**
  * @author Ben Hamilton (aka bonjih)
+ *
+ * /**
+ * Main run class for the bict-explorer GUI
  */
+
 public class BICT_Explorer_GuiMain extends Application {
     static Degree myDegree;
     //  static Option careerChoice ;//= null;

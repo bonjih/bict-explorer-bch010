@@ -89,7 +89,7 @@
                         <Font name="Arial Bold" size="15.0" />
                      </font>
                   </Label>
-                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="342.0" prefHeight="196.0" prefWidth="644.0"
+                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="388.0" prefHeight="5.0" prefWidth="650.0"
                          style="-fx-background-color: #c6c9b5;"/>
                    <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
                           textFill="#1b2bda">
@@ -97,7 +97,7 @@
                            <Font name="Arial Bold" size="15.0"/>
                        </font>
                    </Label>
-                   <Label layoutX="296.0" layoutY="309.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
+                   <Label layoutX="296.0" layoutY="353.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
                           textFill="#1b2bda">
                      <font>
                          <Font name="Arial Bold" size="20.0"/>
@@ -186,14 +186,14 @@
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-       <Button fx:id="reportButton" layoutX="1238.0" layoutY="590.0" mnemonicParsing="false"
+       <Button fx:id="reportButton" layoutX="1238.0" layoutY="627.0" mnemonicParsing="false"
                onAction="#printReportClicked" prefHeight="25.0" prefWidth="112.0"
                style="-fx-background-color: lightgray;" text="Print Report" textFill="MEDIUMBLUE">
          <font>
             <Font name="Baskerville Old Face" size="15.0" />
          </font>
       </Button>
-       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="583.0" promptText="enter your name"
+       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="620.0" promptText="enter your name"
                   style="-fx-background-color: lightgray;" stylesheets="@bictCss.css"/>
       <ImageView fitHeight="107.0" fitWidth="177.0" layoutY="586.0" pickOnBounds="true" preserveRatio="true">
          <image>
