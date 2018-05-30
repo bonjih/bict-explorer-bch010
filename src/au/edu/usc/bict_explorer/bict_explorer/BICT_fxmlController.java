@@ -6,6 +6,7 @@ import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -20,17 +21,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
@@ -40,10 +37,9 @@ import java.util.logging.Logger;
 import static au.edu.usc.bict_explorer.bict_explorer.BICT_txt_explorer.downStreamCourse;
 
 /**
+ **
  * @author Ben Hamilton (aka bonjih)
- */
 
-/**
  * BICT GUI / FXML Controller Class
  * Handles the shape additions to the scene and shape/node behaviour
  */
@@ -61,17 +57,24 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     Set<String> careerKeys;
     Set<String> minorKeys;
     Set<String> coursesKeys;
+    String selectedElective;
     String careerChoice;
+    Set<String> electives = new LinkedHashSet<>();
     Set<Option> minorCourseForthisCareer = new LinkedHashSet<>();
+
     private Button next;
+    private Map<String, Course> myCourses;
     private ObservableList<Node> node;
-    private VBox reportBox = new VBox( 1 );
+    private VBox reportBox = new VBox( 2 );
+    private VBox detailsBox = new VBox( 1 );
     List<String> minorCourse = new ArrayList<>();
 
     ObservableList<String> careerListItems = FXCollections.observableArrayList();
 
     @FXML
     ListView<String> careersListView;
+
+//    ObservableList<String> compulsoryMinorsList = FXCollections.observableArrayList();
 
     @FXML
     private Text minor1;
@@ -95,23 +98,68 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     private Pane reportPane;
 
     @FXML
+    private Pane descriptionBox;
+
+    @FXML
+    private ToggleButton elective1;
+
+    @FXML
+    private ToggleButton elective2;
+
+    @FXML
+    private ToggleButton elective3;
+
+    @FXML
+    private ToggleButton elective4;
+
+    @FXML
+    private ToggleButton elective5;
+
+    @FXML
+    private ToggleButton elective6;
+
+    @FXML
+    private Text minorIS;
+
+    @FXML
+    private Text minorGP;
+
+    @FXML
+    private Text minorTCN;
+
+    @FXML
+    private Text minorDM;
+
+    @FXML
+    private Text minorSD;
+
+    @FXML
+    private TextField nameTextField;
+
+    @FXML
     private MenuItem guiClose;
-
-    @FXML
-    private MenuItem fileOpen;
-
-    @FXML
-    private MenuItem fileSave;
 
     @FXML
     private Text errorStatus;
 
+    @FXML
+    private Button reportButton;
+
+
+    Option currentMinorOption;
+    PrintWriter bictOut;
+    Course currentCourseOption;
     ArrayList<String> extraMinors = new ArrayList<>();
+
+    ToggleGroup group = new ToggleGroup();
 
     ObservableList<String> choiceBoxItems = FXCollections.observableArrayList();
 
     private Option compulsoryMinors;
 
+    File file;
+
+    //ArrayList<String> selectedMinorCourses =new ArrayL
     Set<String> selectedMinorKeys = new LinkedHashSet<>();
 
     /**
@@ -125,6 +173,8 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+        file = new File( "bict.txt" );
 
         try {
 
@@ -150,82 +200,60 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         } );
         careersListView.setItems( careerListItems );
 
-        //compulsory minors
         compulsoryMinorsPane.getChildren().add( displayCompulsoryMinors() );
+
+        //report box
+        reportBox.setPadding( new Insets( 50, 0, 0, 0 ) );
+        reportPane.getChildren().add( reportBox );
+
+        //details box
+        detailsBox.setPadding( new Insets( 50, 0, 0, 0 ) );
+        descriptionBox.getChildren().add( detailsBox );
+
+        //electives
+        coursesKeys.forEach( key -> {
+            if (key.startsWith( "EN" ) || key.startsWith( "MT" ) || key.startsWith( "DES" )) {
+                electives.add( key );
+            }
+        } );
+
+        // new elective option. Add into courses.options
+        elective1.setText( courses.get( "MTH103" ).getName() );
+        elective2.setText( courses.get( "MTH212" ).getName() );
+        elective3.setText( courses.get( "DES221" ).getName() );
+        elective4.setText( courses.get( "DES222" ).getName() );
+        elective5.setText( courses.get( "ENG103" ).getName() );
+        elective6.setText( courses.get( "DES223" ).getName() );
+
+        elective1.setToggleGroup( group );
+        elective2.setToggleGroup( group );
+        elective3.setToggleGroup( group );
+        elective4.setToggleGroup( group );
+        elective5.setToggleGroup( group );
+        elective6.setToggleGroup( group );
+
+        //minors
+        minorSD.setOnMouseClicked( e -> {
+            makeMinorDetailsBox( e.getSource() );
+        } );
+
+        minorIS.setOnMouseClicked( e -> {
+            makeMinorDetailsBox( e.getSource() );
+        } );
+
+        minorTCN.setOnMouseClicked( e -> {
+            makeMinorDetailsBox( e.getSource() );
+        } );
+
+        minorGP.setOnMouseClicked( e -> {
+            makeMinorDetailsBox( e.getSource() );
+        } );
+
+        minorDM.setOnMouseClicked( e -> {
+            makeMinorDetailsBox( e.getSource() );
+        } );
+
         confirmMinor.setDisable( true );
-
-        reportPane.getChildren().add( makeReportPane() );
-
-    }
-
-    File dataFile = null;
-    final FileChooser fileChooser = new FileChooser();
-
-    /**
-     * @throws IOException    to throw error if read file is incorrect.
-     * @throws ParseException if the given format (txt) is not supplied. Event
-     *                        handler for open file request.
-     */
-    @FXML
-    void setOnfileOpenRequest() throws IOException, ParseException {
-
-        fileChooser.setTitle( "Open file" );
-
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter( "Text Files", "*.txt" ),
-                new FileChooser.ExtensionFilter( "All Files", "*.*" ) );
-
-        File savedFile = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
-
-        if (savedFile != null) {
-
-            try (Scanner scan = new Scanner( savedFile )) {
-
-                // grabbing the file data String
-                String content = scan.useDelimiter( "/n" ).next(); //TODO
-//            myTextArea.setText( content );
-
-                dataFile = savedFile;
-
-                // enabling fileSave
-                fileSave.setDisable( false );
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * @throws IOException    to throw error if write to file error has occurred.
-     * @throws ParseException if the given format (txt) is not supplied. Event
-     *                        handler for save file request
-     */
-    @FXML
-    private void setOnfileSaveAsRequest() throws IOException, ParseException {
-
-        fileChooser.setTitle( "Save file" );
-
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter( "Text Files", "*.txt" ),
-                new FileChooser.ExtensionFilter( "All Files", "*.*" ) );
-
-        File saveAsFile = fileChooser.showOpenDialog( fileOpen.getParentPopup().getScene().getWindow() );
-
-        if (saveAsFile != null) {
-            try (PrintStream ps = new PrintStream( saveAsFile )) {
-
-//                ps.print( careersBox.getText() );
-                // saving the file for use by the fileSave
-                dataFile = saveAsFile;
-
-                // enabling fileSave
-                fileSave.setDisable( false );
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
 
     }
 
@@ -235,8 +263,8 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     @FXML
     void setOnCloseRequest() {
 
-//        guiClose.setOnAction( t -> Platform.exit() );
-        guiClose.setOnAction( t -> System.exit( 0 ) ); /// ***********TODO fix
+//        guiClose.setOnAction( t -> Platform.exit() ); /// ***********TODO Also 2 x clicks to close
+        guiClose.setOnAction( t -> System.exit( 0 ) ); /// ***********TODO 2 x clicks to close
     }
 
     /**
@@ -272,26 +300,189 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         }
     }
 
+
     /**
-     * @param e not used
-     *          Mouse even handler for career selection
+     * @param object
+     * Provides the description of each minor
+     *
      */
+    private void makeMinorDetailsBox(Object object) {
+        Text sourceText = (Text) object;
+        String minorText = sourceText.getText();
+
+        minors.entrySet().forEach( minor -> {
+            if (minor.getValue().getName().equals( minorText )) {
+                currentMinorOption = minor.getValue();
+            }
+        } );
+        if (!detailsBox.getChildren().isEmpty()) {
+            detailsBox.getChildren().clear();
+        }
+
+        if (currentMinorOption instanceof Option) {
+            String name = currentMinorOption.getName();
+            String description = currentMinorOption.getDescription();
+            Set<Option> downStream = currentMinorOption.getDownstream();
+
+            Label nameLabel = new Label( name );
+            nameLabel.setStyle( "-fx-font-size:16; -fx-font-weight:bold" );
+
+            Label descriptionLabel = new Label( "DESCRIPTION:" + description );
+            descriptionLabel.setStyle( "-fx-font-size:15; -fx-font-weight:bold " );
+
+            detailsBox.getChildren().addAll( nameLabel, descriptionLabel );
+
+            Label bictMinor = new Label( "BICT MINOR" );
+
+            detailsBox.getChildren().add( bictMinor );
+            downStream.forEach( option -> {
+                Label label = new Label( option.getName() );
+
+                detailsBox.getChildren().add( label );
+            } );
+
+        }
+    }
+
+    @FXML
+    public void onElective1selected(Event e) {
+        if (elective1.isSelected()) {
+            elective1.setStyle( "-fx-background-color:#c6e519" );
+            selectedElective = elective1.getText();
+            courses.entrySet().forEach( course -> {
+                if (course.getValue().getName().equals( selectedElective )) {
+                    makeCourseDetailsBox( course.getValue().getName() );
+                }
+            } );
+        }
+
+        elective2.setStyle( "-fx-background-color:#94baf7" );
+        elective3.setStyle( "-fx-background-color:#94baf7" );
+        elective4.setStyle( "-fx-background-color:#94baf7" );
+        elective5.setStyle( "-fx-background-color:#94baf7" );
+        elective6.setStyle( "-fx-background-color:#94baf7" );
+
+    }
+
+    @FXML
+    public void onElective2selected(Event e) {
+        if (elective2.isSelected()) {
+            elective2.setStyle( "-fx-background-color:#c6e519" );
+            selectedElective = elective2.getText();
+
+            courses.entrySet().forEach( course -> {
+                if (course.getValue().getName().equals( selectedElective )) {
+                    makeCourseDetailsBox( course.getValue().getName() );
+                }
+            } );
+        }
+
+        elective1.setStyle( "-fx-background-color:#94baf7" );
+        elective3.setStyle( "-fx-background-color:#94baf7" );
+        elective4.setStyle( "-fx-background-color:#94baf7" );
+        elective5.setStyle( "-fx-background-color:#94baf7" );
+        elective6.setStyle( "-fx-background-color:#94baf7" );
+    }
+
+    @FXML
+    public void onElective3selected(Event e) {
+        if (elective3.isSelected()) {
+            elective3.setStyle( "-fx-background-color:#c6e519" );
+            selectedElective = elective3.getText();
+
+            courses.entrySet().forEach( course -> {
+                if (course.getValue().getName().equals( selectedElective )) {
+                    makeCourseDetailsBox( course.getValue().getName() );
+                }
+            } );
+        }
+
+        elective1.setStyle( "-fx-background-color:#94baf7" );
+        elective2.setStyle( "-fx-background-color:#94baf7" );
+        elective4.setStyle( "-fx-background-color:#94baf7" );
+        elective5.setStyle( "-fx-background-color:#94baf7" );
+        elective6.setStyle( "-fx-background-color:#94baf7" );
+    }
+
+    @FXML
+    public void onElective4selected(Event e) {
+        if (elective4.isSelected()) {
+            elective4.setStyle( "-fx-background-color:#c6e519" );
+            selectedElective = elective4.getText();
+
+            courses.entrySet().forEach( course -> {
+                if (course.getValue().getName().equals( selectedElective )) {
+                    makeCourseDetailsBox( course.getValue().getName() );
+                }
+            } );
+        }
+
+        elective1.setStyle( "-fx-background-color:#94baf7" );
+        elective2.setStyle( "-fx-background-color:#94baf7" );
+        elective3.setStyle( "-fx-background-color:#94baf7" );
+        elective5.setStyle( "-fx-background-color:#94baf7" );
+        elective6.setStyle( "-fx-background-color:#94baf7" );
+
+    }
+
+    @FXML
+    public void onElective5selected(Event e) {
+        if (elective5.isSelected()) {
+            elective5.setStyle( "-fx-background-color:#c6e519" );
+            selectedElective = elective5.getText();
+
+            courses.entrySet().forEach( course -> {
+                if (course.getValue().getName().equals( selectedElective )) {
+                    makeCourseDetailsBox( course.getValue().getName() );
+                }
+            } );
+        }
+
+        elective1.setStyle( "-fx-background-color:#94baf7" );
+        elective2.setStyle( "-fx-background-color:#94baf7" );
+        elective3.setStyle( "-fx-background-color:#94baf7" );
+        elective4.setStyle( "-fx-background-color:#94baf7" );
+        elective6.setStyle( "-fx-background-color:#94baf7" );
+
+    }
+
+    @FXML
+    public void onElective6selected(Event e) {
+        if (elective6.isSelected()) {
+            elective6.setStyle( "-fx-background-color:#c6e519" );
+            selectedElective = elective6.getText();
+
+            courses.entrySet().forEach( course -> {
+                if (course.getValue().getName().equals( selectedElective )) {
+                    makeCourseDetailsBox( course.getValue().getName() );
+                }
+            } );
+
+        }
+        elective1.setStyle( "-fx-background-color:#94baf7" );
+        elective2.setStyle( "-fx-background-color:#94baf7" );
+        elective3.setStyle( "-fx-background-color:#94baf7" );
+        elective4.setStyle( "-fx-background-color:#94baf7" );
+        elective5.setStyle( "-fx-background-color:#94baf7" );
+    }
+
     @FXML
     public void onCareerSelected(MouseEvent e) {
         if (!reportBox.getChildren().isEmpty()) {
             reportBox.getChildren().clear();
-            reportBox.getChildren().add( makeReportPane() );
         }
 
-        careers.forEach( (key, value) -> value.setChosen( false ) );
+        careers.entrySet().forEach( career -> {
+            career.getValue().setChosen( false );
+        } );
 
         careerChoice = careersListView.getSelectionModel().getSelectedItem();
 
-        careers.forEach( (key, value) -> {
-            if (value.getName().equals( careerChoice )) {
-                selectedCareer = value;
+        careers.entrySet().forEach( career -> {
+            if (career.getValue().getName().equals( careerChoice )) {
+                selectedCareer = career.getValue();
 
-                value.setChosen( true );
+                career.getValue().setChosen( true );
                 myDegree.processChanges();
                 updateMinors( selectedCareer );
             }
@@ -300,17 +491,45 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
         //write to file
         next.setDisable( false );
+        makeDetailsBox( selectedCareer );
+    }
 
+    private void makeDetailsBox(Option currentCareerOption) {
+        //   if(currentCareerOption.getClass()==Option){}
+        if (!detailsBox.getChildren().isEmpty()) {
+            detailsBox.getChildren().clear();
+        }
+
+        if (currentCareerOption instanceof Option) {
+            String name = currentCareerOption.getName();
+            String description = currentCareerOption.getDescription();
+            Set<Option> downStream = currentCareerOption.getDownstream();
+
+            Label nameLabel = new Label( name );
+            nameLabel.setStyle( "-fx-font-size:16; -fx-font-weight:bold" );
+
+            Label descriptionLabel = new Label( "DESCRIPTION:" + description );
+            descriptionLabel.setStyle( "-fx-font-size:15; -fx-font-weight:bold " );
+
+            detailsBox.getChildren().addAll( nameLabel, descriptionLabel );
+
+            Label bictMinor = new Label( "BICT MINOR" );
+
+            detailsBox.getChildren().add( bictMinor );
+            downStream.forEach( option -> {
+                Label label = new Label( option.getName() );
+
+                detailsBox.getChildren().add( label );
+            } );
+        }
     }
 
     /**
      * @param selectedCareer Unique code for a career
      *  Defines the properties when the minor checkbox is selected or not.
      */
-
     private void updateMinors(Option selectedCareer) {
         // minorCourseForthisCareer.clear();
-
         confirmMinor.setDisable( false );
         extraMinors.clear();
         choiceBoxItems.clear();
@@ -318,7 +537,9 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         minor3.setText( "" );
 
         //clearing all chosen fields
-        minors.forEach( (key, value) -> value.setChosen( false ) );
+        minors.entrySet().forEach( minor -> {
+            minor.getValue().setChosen( false );
+        } );
 
         compulsoryMinors.setChosen( true );
 
@@ -329,7 +550,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             minor.setChosen( true );
             minorCourse.add( minor.getName() );
             selectedMinorKeys.add( minor.getCode() );
-
         } );
 
         minor1.setText( minorCourse.get( 0 ) );
@@ -337,42 +557,40 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
         extraMinors = new ArrayList<>();
 
-        minors.forEach( (key, value) -> {
+        minors.entrySet().forEach( (Map.Entry<String, Option> minor) -> {
 
-            if (!value.isChosen()) {
-                extraMinors.add( value.getName() );
+            if (!minor.getValue().isChosen()) {
+                extraMinors.add( minor.getValue().getName() );
             }
         } );
 
         choiceBoxItems.addAll( extraMinors );
         choiceBox.setItems( choiceBoxItems );
-
     }
 
     /**
-     * @param e Confirm minor selection before viewing courses
+     * Confirm minor selection before viewing courses
      */
-
     @FXML
-    public void onConfirmMinor(MouseEvent e) {
+    public void onConfirmMinor() {
 
         selectedMinorKeys.clear();
         minorCourseForthisCareer = selectedCareer.getDownstream();
+
         minorCourseForthisCareer.forEach( minor -> {
             minor.setChosen( true );
             minorCourse.add( minor.getName() );
             selectedMinorKeys.add( minor.getCode() );
-
         } );
 
         if (choiceBox.getValue() != null) {
 
             String value = (String) choiceBox.getValue();
             minor3.setText( (String) choiceBox.getValue() );
-            minors.forEach( (key, value1) -> {
-                if (value.equals( value1.getName() )) {
-                    selectedMinorKeys.add( value1.getCode() );
-                    value1.setChosen( true );
+            minors.entrySet().forEach( minor -> {
+                if (value.equals( minor.getValue().getName() )) {
+                    selectedMinorKeys.add( minor.getValue().getCode() );
+                    minor.getValue().setChosen( true );
                     myDegree.processChanges();
                 }
             } );
@@ -380,53 +598,51 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         next.setDisable( false );
     }
 
-    /**
-     * Always displays compulsory subjects for any minor.
+     /**
+     * @return vb - VBox content
+      * Displays compulsory subjects for any minor.
      */
-    private VBox displayCompulsoryMinors() {
+     private VBox displayCompulsoryMinors() {
         VBox vb = new VBox( 1 );
-        vb.getStyleClass().add( "pane" ); //returns an ObservableList.. to css path
+        vb.getStyleClass().add( "pane" );
 
         HBox title = new HBox();
         title.setPadding( new Insets( 0, 40, 0, 0 ) );
-        Label courseCode = new Label( "Code" );
+        Label courseCode = new Label( "CODE" );
         courseCode.setPrefSize( 100, 5 );
-        courseCode.setTextFill( Color.rgb( 27, 43, 218 ) );
-        courseCode.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
 
         Label courseTitle = new Label( "Course Title" );
         courseTitle.setPrefSize( 250, 5 );
-        courseTitle.setTextFill( Color.rgb( 27, 43, 218 ) );
-        courseTitle.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
 
-        Label semesters = new Label( "Semester" );
-        title.getChildren().addAll( courseCode, courseTitle, semesters );
-        semesters.setTextFill( Color.rgb( 27, 43, 218 ) );
-        semesters.setFont( Font.font( null, FontWeight.BOLD, 14 ) );
-
+        title.getChildren().addAll( courseCode, courseTitle, new Label( "SEMESTERS" ) );
         vb.getChildren().add( title );
-
         compulsoryMinors = minors.get( "BICT" );
 
+        // compulsory course (1st years) box setup
         compulsoryMinors.getDownstream().forEach( minor -> {
-            HBox detailsHB = new HBox();
+            HBox detailsHB = new HBox( 1.5 );
+            detailsHB.setStyle( "-fx-background-color:#9acd32" );
             Course c = (Course) minor;
             c.setChosen( true );
-            Label codeButton = new Label( c.getCode() );
-            codeButton.setPrefSize( 75, 5 );
+            Label codeLabel = new Label( c.getCode() );
+            codeLabel.setPrefSize( 75, 5 );
 
             Label nameLabel = new Label( c.getName() );
             nameLabel.setPrefSize( 275, 5 );
 
-            detailsHB.getChildren().addAll( codeButton, nameLabel, new Label( "        " ), new Label( c.getSemesters() ) );
+            detailsHB.getChildren().addAll( codeLabel, nameLabel, new Label( c.getSemesters() ) );
+            detailsHB.setOnMouseClicked( event -> {
+                //  String code = ()
+                HBox source = (HBox) event.getSource();
+                Label label = (Label) source.getChildren().get( 1 );
+                makeCourseDetailsBox( label.getText() );
+            } );
             vb.getChildren().add( detailsHB );
 
         } );
-
-        vb.getChildren().add( new Label( "   " ) ); //for space
-        vb.getChildren().add( new Label( "Choose one elective:" ) );
-        vb.getChildren().add( new Label( "   " ) ); //for space
-
+         vb.getChildren().add( new Label( "   " ) ); //for space
+         vb.getChildren().add( new Label( "Choose an elective for compulsory courses" ) );
+         vb.getChildren().add( new Label( "   " ) ); //for space
         HBox hb1 = new HBox();
         CheckBox cb1 = new CheckBox( "ICT341" );
         Course choice1 = (Course) courses.get( cb1.getText() );
@@ -438,69 +654,74 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         hb2.getChildren().addAll( cb2, new Label( choice2.getName() ), new Label( choice2.getSemesters() ) );
         vb.getChildren().addAll( hb1, hb2 );
 
-        vb.getChildren().add( new Label( "   " ) ); //for space
+         vb.getChildren().add( new Label( "   " ) ); //for space
         next = new Button( "Next ->" );
         next.setAlignment( Pos.BOTTOM_RIGHT );
-        next.setOnAction( e -> makeReport() );
+        next.setOnAction( e -> {
+            makeReport();
+        } );
         vb.getChildren().add( next );
 
         return vb;
-
     }
 
     /**
-     * Creates report based pane
+     * @param code used to hold course code
+     *   Creates Course deatails view
      */
-    private VBox makeReportPane() {
-        if (!reportBox.getChildren().isEmpty()) {
-            reportBox.getChildren().clear();
-            reportBox.getChildren().add( makeReportPane() );
+    private void makeCourseDetailsBox(String code) {
+
+        courses.entrySet().forEach( course -> {
+            if (course.getValue().getName().equals( code )) {
+                currentCourseOption = (Course) course.getValue();
+            }
+        } );
+        if (!detailsBox.getChildren().isEmpty()) {
+            detailsBox.getChildren().clear();
         }
 
-        VBox content = new VBox();
+        if (currentCourseOption instanceof Course) {
+            String name = currentCourseOption.getName();
+            String description = currentCourseOption.getDescription();
+            Set<Option> downStream = currentCourseOption.getDownstream();
+            String semester = currentCourseOption.getSemesters();
+            String preQ = currentCourseOption.getPreReqs().toString();
 
-        Label minor = new Label( "BICT Minor" );
-        minor.setTextFill( Color.rgb( 27, 43, 218 ) );
-        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
-        HBox title = new HBox();
-        Label code = new Label( "Code" );
-        code.setPrefSize( 50, 5 );
-        code.setTextFill( Color.rgb( 27, 43, 218 ) );
-        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+            Label nameLabel = new Label( name );
+            nameLabel.setStyle( "-fx-font-size:16; -fx-font-weight:bold" );
 
-        Label courseTitle = new Label( "Title" );
-        courseTitle.setPrefSize( 300, 5 );
-        courseTitle.setTextFill( Color.rgb( 27, 43, 218 ) );
-        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+            Label descriptionLabel = new Label( "DESCRIPTION:" );
+            TextArea descriptionText = new TextArea( description );
+            descriptionText.setPrefSize( 650, 100 );
+            descriptionText.setPrefColumnCount( 500 );
+            descriptionText.setPrefRowCount( 100 );
+            descriptionText.setEditable( false );
+            descriptionText.setWrapText( true );
+            descriptionLabel.setStyle( "-fx-font-size:15; -fx-font-weight:bold " );
 
-        Label sem = new Label( "Semesters" );
-        sem.setPrefSize( 75, 5 );
-        sem.setTextFill( Color.rgb( 27, 43, 218 ) );
-        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
 
-        Label preq = new Label( "Prerequisites" );
-        preq.setPrefSize( 230, 5 );
-        preq.setTextFill( Color.rgb( 27, 43, 218 ) );
-        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
-        Label satisfied = new Label( "Satisfied" );
-        satisfied.setTextFill( Color.rgb( 27, 43, 218 ) );
-        minor.setFont( Font.font( null, FontWeight.BOLD, 13 ) );
+            Label semLabel = new Label( "Semester :     " + semester );
+            nameLabel.setStyle( "-fx-font-size:15; -fx-font-weight:bold" );
+            Label preqLabel = new Label( "Prerequisites :   " + preQ );
+            nameLabel.setStyle( "-fx-font-size:15; -fx-font-weight:bold" );
 
-        title.getChildren().addAll( code, courseTitle, sem, preq, satisfied );
+            detailsBox.getChildren().addAll( nameLabel, descriptionLabel, descriptionText, semLabel, preqLabel );
+            downStream.forEach( option -> {
+                Label label = new Label( option.getName() );
 
-        content.getChildren().addAll( minor, title );
+                detailsBox.getChildren().add( label );
+            } );
 
-        return content;
+        }
     }
 
     /**
-     * Makes the report based on user selection.
+     * Creates report based user selectiom
+     * Shows errors if user information is missing.
      */
-
     private void makeReport() {
         if (!reportBox.getChildren().isEmpty()) {
             reportBox.getChildren().clear();
-            reportBox.getChildren().add( makeReportPane() );
         }
 
         if (selectedMinorKeys.size() == 2) {
@@ -509,12 +730,13 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             alert.setTitle( "BICT Minor" );
             alert.setContentText( "You must pick an an extra BICT minor" );
             alert.show();
-
+        } else if (selectedElective == null) {
+            Alert alert = new Alert( AlertType.INFORMATION );
+            alert.setTitle( "BICT Elective" );
+            alert.setContentText( "You must pick at least one Elective" );
+            alert.show();
         } else {
-
             next.setDisable( true );
-            node = reportPane.getChildren();
-            reportBox = (VBox) node.get( node.size() - 1 );
 
             Set<Option> minorsOptionsSet = new HashSet<>();
 
@@ -528,7 +750,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             }
 
             Set<String> selectedCoursesKeys = new HashSet<>();
-            Map<String, Course> myCourses = new HashMap<>();
+            myCourses = new HashMap<>();
 
             minorsOptionsSet.forEach( (Option action) -> {
 
@@ -536,6 +758,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
                 downStreamCourse.forEach( member -> {
 
+                    // bictOut.println(member.getCode()+" "+ member.getName());
                     selectedCoursesKeys.add( member.getCode() );
                     myCourses.put( member.getCode(), (Course) courses.get( member.getCode() ) );
                     member.setChosen( true );
@@ -544,32 +767,33 @@ public class BICT_fxmlController implements Initializable { //initialise the con
                 action.setChosen( true );
             } );
 
-             myCourses.forEach( (key, value) -> {
+            Map<String, Course> pre = new HashMap<>();
+
+            myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
 
                 HBox hb = new HBox( 20 );
-                String preRequisites = value.getPreReqs().toString();
+                hb.setStyle( "-fx-background-color:#94baf7" );
+                String preRequisites = course.getValue().getPreReqs().toString();
 
-                Label code = new Label( value.getCode() );
+                Label code = new Label( course.getValue().getCode() );
                 code.setPrefSize( 50, 5 );
 
-                Label name = new Label( value.getName() );
-                name.setPrefSize( 300, 5 );
+                Label name = new Label( course.getValue().getName() );
+                name.setPrefSize( 275, 5 );
 
-                Label sem = new Label( value.getSemesters() );
-                sem.setPrefSize( 50, 5 );
+                Label sem = new Label( course.getValue().getSemesters() );
+                sem.setPrefSize( 25, 5 );
 
                 Label preQ = new Label( preRequisites );
                 preQ.setPrefSize( 200, 5 );
-
 
                 ImageView satisfiedIcon = new ImageView();
                 satisfiedIcon.setFitHeight( 15 );
                 satisfiedIcon.setFitWidth( 15 );
 
-                if (value.isSatisfied( myCourses )) {
+                if (course.getValue().isSatisfied( myCourses )) {
 
-                    Image satisfiedImage = new Image( "https://upload.wikimedia.org/wikipedia/en/e/e4/Green_tick.png" );
-
+                    Image satisfiedImage = new Image( "https://upload.wikimedia.org/wikipedia/en/e/e4/Green_tick.png" ); // cant retrieve from local folder?
                     Tooltip tip = new Tooltip( "Prerequisites satisfied" );
                     Tooltip.install( satisfiedIcon, tip );
                     satisfiedIcon.setImage( satisfiedImage );
@@ -577,17 +801,66 @@ public class BICT_fxmlController implements Initializable { //initialise the con
                     hb.getChildren().addAll( code, name, sem, preQ, satisfiedIcon );
 
                 } else {
-                    Image dissatisfiedImage = new Image( "https://upload.wikimedia.org/wikipedia/commons/7/7e/Red_x.png" );
+                    Image dissatisfiedImage = new Image( "https://upload.wikimedia.org/wikipedia/commons/7/7e/Red_x.png" ); // cant retrieve from local folder??
                     Tooltip tip = new Tooltip( "Prerequisites not satisfied" );
                     Tooltip.install( satisfiedIcon, tip );
                     satisfiedIcon.setImage( dissatisfiedImage );
 
                     hb.getChildren().addAll( code, name, sem, preQ, satisfiedIcon );
-                    // hb.getChildren().addAll(new Label(course.getValue().getCode()),new Label(course.getValue().getName()),new Label(course.getValue().getSemesters()),new Label(preRequisites),new Label("NOT OK"));
                 }
+
+                hb.setOnMouseClicked( event -> {
+                    //  String code = ()
+                    HBox source = (HBox) event.getSource();
+                    Label label = (Label) source.getChildren().get( 1 );
+                    makeCourseDetailsBox( label.getText() );
+                } );
 
                 reportBox.getChildren().add( hb );
             } );
         }
+    }
+
+    /**
+     *Prints the report based on user selection.
+     */
+    @FXML
+    private void printReportClicked() {
+        if (myCourses.isEmpty()) {
+            Alert alert = new Alert( AlertType.INFORMATION );
+            alert.setTitle( "MISSING DATA" );
+            alert.setContentText( "You have not picked any course" );
+            alert.show();
+        } else if (nameTextField.getText().isEmpty()) {
+            Alert alert = new Alert( AlertType.INFORMATION );
+            alert.setTitle( "NAME" );
+            alert.setContentText( "You must enter your name to print the report" );
+            alert.show();
+        } else {
+            bictOut.println( "NAME:" + nameTextField.getText().toUpperCase() );
+            bictOut.println( "CAREER :" + selectedCareer );
+            bictOut.println( "MINOR : " );
+            selectedMinorKeys.forEach( minor -> {
+                bictOut.println( minors.get( minor ).getName() );
+            } );
+            bictOut.println( "ELECTIVE " + selectedElective );
+            bictOut.println( "COURSES" );
+            myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
+                String preRequisites = course.getValue().getPreReqs().toString();
+
+                bictOut.println( course.getValue().getCode() + "\t" + course.getValue().getName() + "\t Semester:" + course.getValue().getSemesters() + "\t Prerequisites \t" + preRequisites );
+
+
+            } );
+            Alert alert = new Alert( AlertType.INFORMATION );
+            alert.setTitle( "COMPLETE" );
+            alert.setContentText( "Report generated successfully\n" + "File location :" + file.getPath() );
+            alert.show();
+
+
+            bictOut.close();
+
+        }
+
     }
 }

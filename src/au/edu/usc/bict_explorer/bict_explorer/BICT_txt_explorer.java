@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 /**
  * This Class prints to file "bict.txt" the Course options output of chosen Career and minors
+ * Created to understand the rules package
  */
 
 public class BICT_txt_explorer {
