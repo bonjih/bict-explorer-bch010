@@ -111,13 +111,14 @@
             <VBox prefHeight="200.0" prefWidth="200.0">
                <children>
                   <ListView fx:id="careersListView" onMouseClicked="#onCareerSelected" prefHeight="205.0" prefWidth="200.0" />
-                        <Label alignment="CENTER" contentDisplay="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="43.0" prefWidth="200.0" text="BICT Minors" textAlignment="CENTER" textFill="#1b2bda">
+                   <Label alignment="CENTER" contentDisplay="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="43.0"
+                          prefWidth="200.0" text="Current BICT Minors" textAlignment="CENTER" textFill="#1b2bda">
                      <font>
                         <Font name="Arial Bold" size="17.0" />
                      </font></Label>
                         <Text fx:id="minorSD" fill="#0d0d0d" strokeType="OUTSIDE" strokeWidth="0.0" text="Software Development">
                      <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
+                         <Insets top="5.0"/>
                      </VBox.margin>
                      <font>
                         <Font name="Arial Rounded MT Bold" size="14.0" />

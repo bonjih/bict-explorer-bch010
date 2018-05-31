@@ -1,8 +1,6 @@
 
 package au.edu.usc.bict_explorer.bict_explorer;
 
-import au.edu.usc.bict_explorer.rules.Degree;
-import au.edu.usc.bict_explorer.rules.Option;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +11,6 @@ import javafx.stage.Stage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 /**
  * @author Ben Hamilton (aka bonjih)
@@ -45,8 +42,8 @@ public class BICT_Explorer_GuiMain extends Application {
         Scene scene = new Scene( pane, 1370, 705 );
 
         // for testing of various heights and widths
-        scene.widthProperty().addListener( (observableValue, oldSceneWidth, newSceneWidth) -> System.out.println( "Width: " + newSceneWidth ) );
-        scene.heightProperty().addListener( (observableValue, oldSceneHeight, newSceneHeight) -> System.out.println( "Height: " + newSceneHeight ) );
+//        scene.widthProperty().addListener( (observableValue, oldSceneWidth, newSceneWidth) -> System.out.println( "Width: " + newSceneWidth ) );
+//        scene.heightProperty().addListener( (observableValue, oldSceneHeight, newSceneHeight) -> System.out.println( "Height: " + newSceneHeight ) );
 
 
         scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );

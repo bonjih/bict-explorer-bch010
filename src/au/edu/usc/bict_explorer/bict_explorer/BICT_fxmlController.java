@@ -6,7 +6,6 @@ import au.edu.usc.bict_explorer.rules.Degree;
 import au.edu.usc.bict_explorer.rules.Option;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -17,7 +16,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -26,6 +24,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -37,9 +36,10 @@ import java.util.logging.Logger;
 import static au.edu.usc.bict_explorer.bict_explorer.BICT_txt_explorer.downStreamCourse;
 
 /**
- **
+ * *
+ *
  * @author Ben Hamilton (aka bonjih)
-
+ * <p>
  * BICT GUI / FXML Controller Class
  * Handles the shape additions to the scene and shape/node behaviour
  */
@@ -48,33 +48,39 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     Degree myDegree;
     Option selectedCareer;
+    Option currentMinorOption;
+    Course currentCourseOption;
     File minorsFile;
     File courseFile;
     File careersFile;
+    File file = new File( "bict.txt" );
+    PrintWriter bictOut;
     Map<String, Option> courses;
     Map<String, Option> careers;
     Map<String, Option> minors;
     Set<String> careerKeys;
     Set<String> minorKeys;
     Set<String> coursesKeys;
-    String selectedElective;
-    String careerChoice;
     Set<String> electives = new LinkedHashSet<>();
     Set<Option> minorCourseForthisCareer = new LinkedHashSet<>();
+    Set<String> selectedMinorKeys = new LinkedHashSet<>();
+    List<String> minorCourse = new ArrayList<>();
+    ArrayList<String> extraMinors = new ArrayList<>();
+    String selectedElective;
+    String careerChoice;
+    ObservableList<String> careerListItems = FXCollections.observableArrayList();
+    ObservableList<String> choiceBoxItems = FXCollections.observableArrayList();
+    ToggleGroup group = new ToggleGroup();
 
     private Button next;
     private Map<String, Course> myCourses;
     private ObservableList<Node> node;
     private VBox reportBox = new VBox( 2 );
     private VBox detailsBox = new VBox( 1 );
-    List<String> minorCourse = new ArrayList<>();
-
-    ObservableList<String> careerListItems = FXCollections.observableArrayList();
+    private Option compulsoryMinors;
 
     @FXML
     ListView<String> careersListView;
-
-//    ObservableList<String> compulsoryMinorsList = FXCollections.observableArrayList();
 
     @FXML
     private Text minor1;
@@ -142,25 +148,13 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     @FXML
     private Text errorStatus;
 
-    @FXML
-    private Button reportButton;
+    /**
+     * @throws FileNotFoundException - for print report method file not found
+     */
+    public BICT_fxmlController() throws FileNotFoundException {
 
-
-    Option currentMinorOption;
-    PrintWriter bictOut;
-    Course currentCourseOption;
-    ArrayList<String> extraMinors = new ArrayList<>();
-
-    ToggleGroup group = new ToggleGroup();
-
-    ObservableList<String> choiceBoxItems = FXCollections.observableArrayList();
-
-    private Option compulsoryMinors;
-
-    File file;
-
-    //ArrayList<String> selectedMinorCourses =new ArrayL
-    Set<String> selectedMinorKeys = new LinkedHashSet<>();
+        bictOut = new PrintWriter( file );
+    }
 
     /**
      * Initializes the controller class.
@@ -173,8 +167,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        file = new File( "bict.txt" );
 
         try {
 
@@ -279,6 +271,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         WebView webView = new WebView();
         webView.setMaxHeight( 300 );
         webView.setMaxWidth( 550 );
+        webView.setStyle( "-fx-border-color: black;" );
 
         errorStatus = new Text();
 
@@ -287,10 +280,10 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
                 webView.getEngine().load( helpFile );
                 Scene scene = new Scene( webView );
-                Stage stage = new Stage(  );
-                stage.setTitle("Help Menu");
-                stage.setResizable(false);
-                stage.setScene(scene);
+                Stage stage = new Stage();
+                stage.setTitle( "Help Menu" );
+                stage.setResizable( false );
+                stage.setScene( scene );
                 stage.show();
 
             } catch (Exception e) {
@@ -302,8 +295,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param object creates source
-     * Provides the description of each minor
-     *
+     *               Provides the description of each minor
      */
     private void makeMinorDetailsBox(Object object) {
         Text sourceText = (Text) object;
@@ -346,6 +338,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     /**
      * the following functions are for the elective selections 1-6.
      * No the best implementation as there is duplicate code
+     * Intellij shows repeating code, however not all elective methods have 1,2,3,4,5,6, combination of.
      */
     @FXML
     public void onElective1selected() {
@@ -537,7 +530,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param selectedCareer Unique code for a career
-     *  Defines the properties when the minor checkbox is selected or not.
+     *                       Defines the properties when the minor checkbox is selected or not.
      */
     private void updateMinors(Option selectedCareer) {
         // minorCourseForthisCareer.clear();
@@ -609,26 +602,26 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         next.setDisable( false );
     }
 
-     /**
+    /**
      * @return vb - VBox content
-      * Displays compulsory subjects for any minor.
-      */
+     * Displays compulsory subjects for any minor.
+     */
 
-     // in my effort to reduce redundant code prefWidth/height is common across all.
-     // this has effected overall layout
-     private VBox displayCompulsoryMinors() {
+    // in my effort to reduce redundant code prefWidth/height is common across all.
+    // this has effected overall layout
+    private VBox displayCompulsoryMinors() {
         VBox vb = new VBox( 1 );
         vb.getStyleClass().add( "pane" );
 
         HBox title = new HBox();
-         title.setPadding( new Insets( 0, 40, 0, 0 ) );
+        title.setPadding( new Insets( 0, 40, 0, 0 ) );
         Label courseCode = new Label( "Course Code" );
         courseCode.setPrefSize( 100, 5 );
 
         Label courseTitle = new Label( "Course Title" );
-         courseTitle.setPrefSize( 250, 5 );
+        courseTitle.setPrefSize( 250, 5 );
 
-         title.getChildren().addAll( courseCode, courseTitle, new Label( "Semesters" ) );
+        title.getChildren().addAll( courseCode, courseTitle, new Label( "Semesters" ) );
         vb.getChildren().add( title );
         compulsoryMinors = minors.get( "BICT" );
 
@@ -654,9 +647,9 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             vb.getChildren().add( detailsHB );
 
         } );
-         vb.getChildren().add( new Label( "   " ) ); //for space
-         vb.getChildren().add( new Label( "Choose an elective for compulsory courses" ) );
-         vb.getChildren().add( new Label( "   " ) ); //for space
+        vb.getChildren().add( new Label( "   " ) ); //for space
+        vb.getChildren().add( new Label( "Choose an elective for compulsory courses" ) );
+        vb.getChildren().add( new Label( "   " ) ); //for space
         HBox hb1 = new HBox();
         CheckBox cb1 = new CheckBox( "ICT341" );
         Course choice1 = (Course) courses.get( cb1.getText() );
@@ -668,7 +661,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         hb2.getChildren().addAll( cb2, new Label( choice2.getName() ), new Label( choice2.getSemesters() ) );
         vb.getChildren().addAll( hb1, hb2 );
 
-         vb.getChildren().add( new Label( "   " ) ); //for space
+        vb.getChildren().add( new Label( "   " ) ); //for space
         next = new Button( "Next ->" );
         next.setAlignment( Pos.BOTTOM_RIGHT );
         next.setOnAction( e -> {
@@ -677,11 +670,11 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         vb.getChildren().add( next );
 
         return vb;
-     }
+    }
 
     /**
      * @param code used to hold course code
-     *   Creates Course details view
+     *             Creates Course details view
      */
     private void makeCourseDetailsBox(String code) {
 
@@ -836,20 +829,23 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     /**
-     *Prints the report based on user selection.
+     * Prints the report based on user selection.
      */
     @FXML
     private void printReportClicked() {
+
         if (myCourses.isEmpty()) {
             Alert alert = new Alert( AlertType.INFORMATION );
             alert.setTitle( "MISSING DATA" );
             alert.setContentText( "You have not picked any course" );
             alert.show();
+
         } else if (nameTextField.getText().isEmpty()) {
             Alert alert = new Alert( AlertType.INFORMATION );
             alert.setTitle( "NAME" );
             alert.setContentText( "You must enter your name to print the report" );
             alert.show();
+
         } else {
             bictOut.println( "NAME:" + nameTextField.getText().toUpperCase() );
             bictOut.println( "CAREER :" + selectedCareer );
@@ -861,20 +857,13 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             bictOut.println( "COURSES" );
             myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
                 String preRequisites = course.getValue().getPreReqs().toString();
-
                 bictOut.println( course.getValue().getCode() + "\t" + course.getValue().getName() + "\t Semester:" + course.getValue().getSemesters() + "\t Prerequisites \t" + preRequisites );
-
-
             } );
             Alert alert = new Alert( AlertType.INFORMATION );
             alert.setTitle( "COMPLETE" );
             alert.setContentText( "Report generated successfully\n" + "File location :" + file.getPath() );
             alert.show();
-
-
             bictOut.close();
-
         }
-
     }
 }
