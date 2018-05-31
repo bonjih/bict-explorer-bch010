@@ -5,7 +5,8 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -91,7 +92,7 @@
                         <Font name="Arial Bold" size="15.0" />
                      </font>
                   </Label>
-                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="366.0" prefHeight="5.0" prefWidth="650.0"
+                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="437.0" prefHeight="5.0" prefWidth="650.0"
                          style="-fx-background-color: #c6c9b5;"/>
                    <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
                           textFill="#1b2bda">
@@ -99,12 +100,28 @@
                            <Font name="Arial Bold" size="15.0"/>
                        </font>
                    </Label>
-                   <Label layoutX="255.0" layoutY="331.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
+                   <Label layoutX="255.0" layoutY="402.0" prefHeight="30.0" prefWidth="149.0" text="Course Details"
                           textFill="#1b2bda">
                      <font>
                          <Font name="Arial Bold" size="20.0"/>
                      </font>
                   </Label>
+                   <TextField fx:id="numOfCourses" layoutX="-1.0" layoutY="320.0" prefHeight="25.0" prefWidth="38.0"
+                              style="-fx-background-color: lightgray;" stylesheets="@bictCss.css"/>
+                   <Label layoutX="49.0" layoutY="328.0" text="Number of coures" textAlignment="CENTER"
+                          textFill="#1b2bda">
+                       <font>
+                           <Font name="Arial Bold" size="12.0"/>
+                       </font>
+                   </Label>
+                   <TextField fx:id="numOfMinors" layoutY="360.0" prefHeight="25.0" prefWidth="38.0"
+                              style="-fx-background-color: lightgray;" stylesheets="@bictCss.css"/>
+                   <Label layoutX="50.0" layoutY="368.0" text="Number of minors" textAlignment="CENTER"
+                          textFill="#1b2bda">
+                       <font>
+                           <Font name="Arial Bold" size="12.0"/>
+                       </font>
+                   </Label>
                </children></Pane>
          </right>
          <left>
@@ -112,7 +129,7 @@
                <children>
                   <ListView fx:id="careersListView" onMouseClicked="#onCareerSelected" prefHeight="205.0" prefWidth="200.0" />
                    <Label alignment="CENTER" contentDisplay="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="43.0"
-                          prefWidth="200.0" text="Current BICT Minors" textAlignment="CENTER" textFill="#1b2bda">
+                          prefWidth="200.0" text="Current BICT Minors" textFill="#1b2bda">
                      <font>
                         <Font name="Arial Bold" size="17.0" />
                      </font></Label>
@@ -176,12 +193,22 @@
             </VBox>
          </left>
          <top>
-            <MenuButton mnemonicParsing="false" prefHeight="11.0" prefWidth="99.0" text="Menu" BorderPane.alignment="TOP_LEFT">
-              <items>
-                <MenuItem fx:id="onAbout" mnemonicParsing="false" onAction="#setOnAboutRequest" text="Help" />
-                <MenuItem fx:id="guiClose" mnemonicParsing="false" onAction="#setOnCloseRequest" text="Exit" />
-              </items>
-            </MenuButton>
+             <MenuBar maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="205.0"
+                      BorderPane.alignment="TOP_LEFT">
+                 <menus>
+                     <Menu mnemonicParsing="false" text="File">
+                         <items>
+                             <MenuItem fx:id="guiClose" mnemonicParsing="false" onAction="#setOnCloseRequest"
+                                       text="Close"/>
+                         </items>
+                     </Menu>
+                     <Menu mnemonicParsing="false" text="Help">
+                         <items>
+                             <MenuItem mnemonicParsing="false" onAction="#setOnAboutRequest" text="Help"/>
+                         </items>
+                     </Menu>
+                 </menus>
+             </MenuBar>
          </top>
       </BorderPane>
       <Label layoutX="1297.0" layoutY="36.0" prefHeight="30.0" prefWidth="73.0" text="Satisfied" textFill="#1b2bda">
@@ -189,19 +216,25 @@
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-       <Button fx:id="reportButton" layoutX="1238.0" layoutY="627.0" mnemonicParsing="false"
+       <Button fx:id="reportButton" layoutX="1238.0" layoutY="672.0" mnemonicParsing="false"
                onAction="#printReportClicked" prefHeight="25.0" prefWidth="112.0"
                style="-fx-background-color: lightgray;" text="Print Report" textFill="MEDIUMBLUE">
          <font>
             <Font name="Baskerville Old Face" size="15.0" />
          </font>
       </Button>
-       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="620.0" promptText="enter your name"
+       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="665.0" promptText="enter your name"
                   style="-fx-background-color: lightgray;" stylesheets="@bictCss.css"/>
       <ImageView fitHeight="107.0" fitWidth="177.0" layoutY="586.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/newlogo2.png" />
          </image>
       </ImageView>
+       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1229.0" layoutY="1.0" pickOnBounds="true"
+                  preserveRatio="true">
+           <image>
+               <Image url="@../resources/newlogo.png"/>
+           </image>
+       </ImageView>
    </children>
 </AnchorPane>

@@ -143,6 +143,12 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     private TextField nameTextField;
 
     @FXML
+    private TextField numOfCourses;
+
+    @FXML
+    private TextField numOfMinors;
+
+    @FXML
     private MenuItem guiClose;
 
     @FXML
@@ -530,7 +536,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param selectedCareer Unique code for a career
-     *                       Defines the properties when the minor checkbox is selected or not.
+     * Defines the properties when the minor checkbox is selected or not.
      */
     private void updateMinors(Option selectedCareer) {
         // minorCourseForthisCareer.clear();
@@ -628,7 +634,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         // compulsory course (1st years) box setup
         compulsoryMinors.getDownstream().forEach( minor -> {
             HBox detailsHB = new HBox( 1.5 );
-            detailsHB.setStyle( "-fx-background-color:#9acd32" );
+            detailsHB.setStyle( "-fx-background-color:#94baf7" );
             Course c = (Course) minor;
             c.setChosen( true );
             Label codeLabel = new Label( c.getCode() );
@@ -665,7 +671,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         next = new Button( "Next ->" );
         next.setAlignment( Pos.BOTTOM_RIGHT );
         next.setOnAction( e -> {
-            makeReport();
+            makeReport(); // TODO bug???
         } );
         vb.getChildren().add( next );
 
@@ -824,8 +830,16 @@ public class BICT_fxmlController implements Initializable { //initialise the con
                 } );
 
                 reportBox.getChildren().add( hb );
+
             } );
         }
+
+        //some course stats
+        int courseCount = myCourses.size();
+        int minorCount = minorCourse.size();
+        System.out.println( minorCount );
+        numOfCourses.setText( String.valueOf( courseCount ) );
+        numOfMinors.setText( String.valueOf( minorCount ) );
     }
 
     /**
@@ -838,6 +852,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             Alert alert = new Alert( AlertType.INFORMATION );
             alert.setTitle( "MISSING DATA" );
             alert.setContentText( "You have not picked any course" );
+
             alert.show();
 
         } else if (nameTextField.getText().isEmpty()) {
