@@ -23,11 +23,6 @@ import java.util.Set;
  */
 
 public class BICT_Explorer_GuiMain extends Application {
-    static Degree myDegree;
-    //  static Option careerChoice ;//= null;
-    static Option extraSelectedMinor;
-    static Set<Option> downStreamCourse;
-    static Option selectedCareer;
 
     public static void main(String[] args) throws FileNotFoundException, NoSuchElementException {
         Application.launch( args );
