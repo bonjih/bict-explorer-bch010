@@ -20,11 +20,11 @@
 <?import javafx.scene.text.Text?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="800.0" prefWidth="1405.0" xmlns="http://javafx.com/javafx/9.0.1"
+            prefHeight="800.0" prefWidth="1410.0" xmlns="http://javafx.com/javafx/9.0.1"
             fx:controller="au.edu.usc.bict_explorer.bict_explorer.BICT_fxmlController">
 
    <children>
-       <BorderPane layoutY="2.0" prefHeight="676.0" prefWidth="1200.0" AnchorPane.leftAnchor="0.0">
+       <BorderPane layoutY="2.0" prefHeight="800.0" prefWidth="1386.0">
          <center>
              <Pane fx:id="elective" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="490.0" BorderPane.alignment="CENTER">
                   <children>
@@ -67,12 +67,20 @@
              </Pane>
          </center>
          <right>
-            <Pane fx:id="reportPane" prefHeight="200.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+             <Pane fx:id="reportPane" prefHeight="666.0" prefWidth="666.0" AnchorPane.rightAnchor="0"
+                   BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="5.0" top="10.0" />
                </padding>
                <children>
-                  <Label layoutX="5.0" prefHeight="30.0" prefWidth="112.0" text="Course" textFill="#1b2bda">
+                   <Label layoutX="596.0" layoutY="1.0" prefHeight="30.0" prefWidth="73.0" text="Satisfied"
+                          textFill="#1b2bda">
+                       <font>
+                           <Font name="Arial Bold" size="15.0"/>
+                       </font>
+                   </Label>
+                   <Label layoutX="11.0" layoutY="2.0" prefHeight="28.0" prefWidth="73.0" text="Course"
+                          textFill="#1b2bda">
                      <font>
                         <Font name="Arial Bold" size="15.0" />
                      </font>
@@ -92,9 +100,9 @@
                         <Font name="Arial Bold" size="15.0" />
                      </font>
                   </Label>
-                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="437.0" prefHeight="5.0" prefWidth="750.0"
+                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="437.0" prefHeight="6.0" prefWidth="663.0"
                          style="-fx-background-color: #c6c9b5;"/>
-                   <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
+                   <Label layoutX="11.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
                           textFill="#1b2bda">
                        <font>
                            <Font name="Arial Bold" size="15.0"/>
@@ -125,7 +133,7 @@
                </children></Pane>
          </right>
          <left>
-            <VBox prefHeight="200.0" prefWidth="200.0">
+             <VBox prefHeight="765.0" prefWidth="241.0">
                <children>
                   <ListView fx:id="careersListView" onMouseClicked="#onCareerSelected" prefHeight="205.0" prefWidth="200.0" />
                    <Label alignment="CENTER" contentDisplay="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="43.0"
@@ -211,11 +219,6 @@
              </MenuBar>
          </top>
       </BorderPane>
-      <Label layoutX="1297.0" layoutY="36.0" prefHeight="30.0" prefWidth="73.0" text="Satisfied" textFill="#1b2bda">
-         <font>
-            <Font name="Arial Bold" size="15.0" />
-         </font>
-      </Label>
        <Button fx:id="reportButton" layoutX="1238.0" layoutY="664.0" mnemonicParsing="false"
                onAction="#printReportClicked" prefHeight="25.0" prefWidth="112.0"
                style="-fx-background-color: lightgray;" text="Print Report" textFill="MEDIUMBLUE">
@@ -230,8 +233,8 @@
             <Image url="@../resources/newlogo2.png" />
          </image>
       </ImageView>
-       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1215.0" layoutY="1.0" pickOnBounds="true"
-                  preserveRatio="true">
+       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1262.4390411376953" layoutY="1.0" pickOnBounds="true"
+                  preserveRatio="true" AnchorPane.rightAnchor="19.512176513671875">
            <image>
                <Image url="@../resources/newlogo.png"/>
            </image>

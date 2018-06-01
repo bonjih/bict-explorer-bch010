@@ -785,10 +785,10 @@ public class BICT_fxmlController implements Initializable { //initialise the con
                 String preRequisites = course.getValue().getPreReqs().toString();
 
                 Label code = new Label( course.getValue().getCode() );
-                code.setPrefSize( 50, 5 );
+                code.setPrefSize( 55, 5 );
 
                 Label name = new Label( course.getValue().getName() );
-                name.setPrefSize( 275, 5 );
+                name.setPrefSize( 285, 5 );
 
                 Label sem = new Label( course.getValue().getSemesters() );
                 sem.setPrefSize( 25, 5 );
