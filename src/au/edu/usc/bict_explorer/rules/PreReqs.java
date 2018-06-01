@@ -39,6 +39,16 @@ public class PreReqs {
         return true;
     }
 
+    public boolean isSatisfied2(Map<String, Option> courses) {
+        for (String req : required) {
+            if (!courses.containsKey( req )) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     @Override
     public String toString() {
         return Arrays.toString(this.required).replaceAll("[ \\[\\]]", "");

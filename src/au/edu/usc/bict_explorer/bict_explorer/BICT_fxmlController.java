@@ -205,7 +205,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
         reportPane.getChildren().add( reportBox );
 
         //details box
-        detailsBox.setPadding( new Insets( 50, 0, 0, 0 ) );
+        detailsBox.setPadding( new Insets( 20, 0, 0, 0 ) );
         descriptionBox.getChildren().add( detailsBox );
 
         //electives
@@ -501,8 +501,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param currentCareerOption loads course details for Options and stores in param
-     *                            <p>
-     *                            setups  Options detailsbox and publishes course selected details
+     * setups  Options detailsbox and publishes course selected details
      */
     private void makeDetailsBox(Option currentCareerOption) {
         //   if(currentCareerOption.getClass()==Option){}
@@ -536,7 +535,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
     /**
      * @param selectedCareer Unique code for a career
-     * Defines the properties when the minor checkbox is selected or not.
+     *                       Defines the properties when the minor checkbox is selected or not.
      */
     private void updateMinors(Option selectedCareer) {
         // minorCourseForthisCareer.clear();
@@ -729,7 +728,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
     }
 
     /**
-     * Creates report based user selectiom
+     * Creates report based user selection
      * Shows errors if user information is missing.
      */
     private void makeReport() {
@@ -771,7 +770,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
                 downStreamCourse.forEach( member -> {
 
-                    // bictOut.println(member.getCode()+" "+ member.getName());
                     selectedCoursesKeys.add( member.getCode() );
                     myCourses.put( member.getCode(), (Course) courses.get( member.getCode() ) );
                     member.setChosen( true );
@@ -779,8 +777,6 @@ public class BICT_fxmlController implements Initializable { //initialise the con
 
                 action.setChosen( true );
             } );
-
-            Map<String, Course> pre = new HashMap<>();
 
             myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
 
@@ -834,10 +830,19 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             } );
         }
 
-        //some course stats
-        int courseCount = myCourses.size();
+        //to generate course etc stats
+//        myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {
+//            String preReqs = course.getValue().getPreReqs().toString();
+//            List<String> preReqsList = new ArrayList<>( Arrays.asList( preReqs.split( "," ) ) );
+//
+//            for (int i = 0; i < preReqsList.size(); i++) {
+//                numOfPreReqs.setText( String.valueOf( i ) );
+//
+//            }
+//        } );
+
+        int courseCount = myCourses.size(); // TODO bug when dont pick an elective
         int minorCount = minorCourse.size();
-        System.out.println( minorCount );
         numOfCourses.setText( String.valueOf( courseCount ) );
         numOfMinors.setText( String.valueOf( minorCount ) );
     }
@@ -865,9 +870,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             bictOut.println( "NAME:" + nameTextField.getText().toUpperCase() );
             bictOut.println( "CAREER :" + selectedCareer );
             bictOut.println( "MINOR : " );
-            selectedMinorKeys.forEach( minor -> {
-                bictOut.println( minors.get( minor ).getName() );
-            } );
+            selectedMinorKeys.forEach( minor -> bictOut.println( minors.get( minor ).getName() ) );
             bictOut.println( "ELECTIVE " + selectedElective );
             bictOut.println( "COURSES" );
             myCourses.entrySet().forEach( (Map.Entry<String, Course> course) -> {

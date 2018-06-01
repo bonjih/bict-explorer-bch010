@@ -24,7 +24,7 @@
             fx:controller="au.edu.usc.bict_explorer.bict_explorer.BICT_fxmlController">
 
    <children>
-      <BorderPane layoutY="2.0" prefHeight="676.0" prefWidth="1200.0">
+       <BorderPane layoutY="2.0" prefHeight="676.0" prefWidth="1200.0" AnchorPane.leftAnchor="0.0">
          <center>
              <Pane fx:id="elective" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="490.0" BorderPane.alignment="CENTER">
                   <children>
@@ -92,7 +92,7 @@
                         <Font name="Arial Bold" size="15.0" />
                      </font>
                   </Label>
-                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="437.0" prefHeight="5.0" prefWidth="650.0"
+                   <Pane fx:id="descriptionBox" layoutX="1.0" layoutY="437.0" prefHeight="5.0" prefWidth="750.0"
                          style="-fx-background-color: #c6c9b5;"/>
                    <Label layoutX="5.0" layoutY="22.0" prefHeight="30.0" prefWidth="112.0" text="Code"
                           textFill="#1b2bda">
@@ -216,21 +216,21 @@
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-       <Button fx:id="reportButton" layoutX="1238.0" layoutY="672.0" mnemonicParsing="false"
+       <Button fx:id="reportButton" layoutX="1238.0" layoutY="664.0" mnemonicParsing="false"
                onAction="#printReportClicked" prefHeight="25.0" prefWidth="112.0"
                style="-fx-background-color: lightgray;" text="Print Report" textFill="MEDIUMBLUE">
          <font>
             <Font name="Baskerville Old Face" size="15.0" />
          </font>
       </Button>
-       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="665.0" promptText="enter your name"
+       <TextField fx:id="nameTextField" layoutX="1060.0" layoutY="659.0" promptText="enter your name"
                   style="-fx-background-color: lightgray;" stylesheets="@bictCss.css"/>
       <ImageView fitHeight="107.0" fitWidth="177.0" layoutY="586.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resources/newlogo2.png" />
          </image>
       </ImageView>
-       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1229.0" layoutY="1.0" pickOnBounds="true"
+       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1215.0" layoutY="1.0" pickOnBounds="true"
                   preserveRatio="true">
            <image>
                <Image url="@../resources/newlogo.png"/>

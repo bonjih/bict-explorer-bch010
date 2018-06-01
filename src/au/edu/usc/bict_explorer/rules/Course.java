@@ -13,7 +13,7 @@ public class Course extends Option {
     private final String semesters;
 
     /** The prerequisites of this course. */
-    private final PreReqs preReqs;
+    public final PreReqs preReqs;
 
     /**
      * Create a new option.
@@ -59,7 +59,6 @@ public class Course extends Option {
         //public boolean isSatisfied(Map<String, Option> courses) {
 
         return this.preReqs.isSatisfied(courses);
-
     }
 
     /** @return the prerequisites of this course. */
@@ -70,4 +69,6 @@ public class Course extends Option {
     /** @return the semester in which this course is offered */
     public String getSemesters()
     { return this.semesters;}
+
+
 }
