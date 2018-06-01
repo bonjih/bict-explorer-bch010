@@ -39,7 +39,7 @@ public class BICT_Explorer_GuiMain extends Application {
         pane.getChildren().add( root );
 
 
-        Scene scene = new Scene( pane, 1410, 705 );
+        Scene scene = new Scene( pane, 1430, 705 );
 
         // for testing of various heights and widths
 //        scene.widthProperty().addListener( (observableValue, oldSceneWidth, newSceneWidth) -> System.out.println( "Width: " + newSceneWidth ) );
@@ -47,7 +47,7 @@ public class BICT_Explorer_GuiMain extends Application {
 
 
         scene.getStylesheets().add( getClass().getResource( "bictCss.css" ).toExternalForm() );
-        stage.setMinWidth( 1410 );
+        stage.setMinWidth( 1430 );
         stage.setMinHeight( 740 );
 //        stage.sizeToScene();
         stage.setScene( scene );

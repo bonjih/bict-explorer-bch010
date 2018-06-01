@@ -233,8 +233,9 @@
             <Image url="@../resources/newlogo2.png" />
          </image>
       </ImageView>
-       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1262.4390411376953" layoutY="1.0" pickOnBounds="true"
-                  preserveRatio="true" AnchorPane.rightAnchor="19.512176513671875">
+       <ImageView fitHeight="30.0" fitWidth="200.0" layoutX="1263.4146881103516" layoutY="1.0" pickOnBounds="true"
+                  preserveRatio="true" AnchorPane.bottomAnchor="770.0" AnchorPane.rightAnchor="0.0"
+                  AnchorPane.topAnchor="0.0">
            <image>
                <Image url="@../resources/newlogo.png"/>
            </image>
