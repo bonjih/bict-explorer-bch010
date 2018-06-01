@@ -133,11 +133,12 @@
                </children></Pane>
          </right>
          <left>
-             <VBox prefHeight="765.0" prefWidth="241.0">
+             <VBox prefHeight="765.0" prefWidth="202.0">
                <children>
-                  <ListView fx:id="careersListView" onMouseClicked="#onCareerSelected" prefHeight="205.0" prefWidth="200.0" />
+                   <ListView fx:id="careersListView" onMouseClicked="#onCareerSelected" prefHeight="205.0"
+                             prefWidth="225.0"/>
                    <Label alignment="CENTER" contentDisplay="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="43.0"
-                          prefWidth="200.0" text="Current BICT Minors" textFill="#1b2bda">
+                          prefWidth="170.0" text="Current BICT Minors" textFill="#1b2bda">
                      <font>
                         <Font name="Arial Bold" size="17.0" />
                      </font></Label>
@@ -201,7 +202,7 @@
             </VBox>
          </left>
          <top>
-             <MenuBar maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="205.0"
+             <MenuBar maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="208.0"
                       BorderPane.alignment="TOP_LEFT">
                  <menus>
                      <Menu mnemonicParsing="false" text="File">
