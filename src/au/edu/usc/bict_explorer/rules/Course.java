@@ -55,7 +55,8 @@ public class Course extends Option {
      * @param courses
      * @return true if the prerequisites of this course have been chosen.
      */
-    public boolean isSatisfied(Map<String, Course> courses) {
+    public boolean isSatisfied(Map<String, Course> courses) { // modified because MAP<k,v> does not support MAP<k,? extends v>.
+        // The only objects that are going to use isSatisfied().. not make generic.
         //public boolean isSatisfied(Map<String, Option> courses) {
 
         return this.preReqs.isSatisfied(courses);

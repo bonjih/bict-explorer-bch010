@@ -879,7 +879,7 @@ public class BICT_fxmlController implements Initializable { //initialise the con
             } );
             Alert alert = new Alert( AlertType.INFORMATION );
             alert.setTitle( "COMPLETE" );
-            alert.setContentText( "Report generated successfully\n" + "File location :" + file.getPath() );
+            alert.setContentText( "Report generated successfully\n" + "File location:" + file.getPath() );
             alert.show();
             bictOut.close();
         }
